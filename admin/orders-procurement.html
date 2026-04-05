@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Procurement Hub - FitBox Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../backend.css">
+    <link rel="stylesheet" href="css/orders.css">
+</head>
+<body>
+
+<div class="main-content">
+    <header>
+        <div class="header-left">
+            <div class="title-group">
+                <div class="breadcrumb">Orders / Procurement Hub</div>
+                <h1>Procurement Hub</h1>
+                <p class="header-subtitle">Manage business-to-supplier purchase orders and stock acquisition</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn-primary" onclick="openProcureModal()"><i class="fa-solid fa-cart-plus"></i> New Purchase Order</button>
+        </div>
+    </header>
+
+    <!-- PROCUREMENT STATS -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="icon-label"><i class="fa-solid fa-file-invoice"></i></div>
+            <h3>TOTAL POs</h3>
+            <div class="value" id="poCount">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="icon-label status-pill low"><i class="fa-solid fa-clock-rotate-left"></i></div>
+            <h3>PENDING ARRIVAL</h3>
+            <div class="value" id="pendingCount">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="icon-label status-pill in"><i class="fa-solid fa-boxes-packing"></i></div>
+            <h3>TOTAL SPEND</h3>
+            <div class="value" id="totalSpend">GH₵ 0.00</div>
+        </div>
+    </div>
+
+    <!-- PROCUREMENT TABLE -->
+    <div class="data-section">
+        <div class="section-header">
+            <h2>Purchase History</h2>
+            <p class="section-subtitle">Records of all supplier transactions</p>
+        </div>
+        <table id="procureTable">
+            <thead>
+                <tr>
+                    <th>PO ID</th>
+                    <th>SUPPLIER</th>
+                    <th>ITEM DESCRIPTION</th>
+                    <th>QTY</th>
+                    <th>UNIT COST</th>
+                    <th>TOTAL</th>
+                    <th>DATE</th>
+                    <th>STATUS</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamic Content -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- NEW PO MODAL -->
+<div id="procureModal" class="modal">
+    <div class="modal-content">
+        <h2>New Purchase Order</h2>
+        <div class="form-group">
+            <label>Select Supplier</label>
+            <select id="pSupplier"></select>
+        </div>
+        <div class="form-group">
+            <label>Select Product to Restock</label>
+            <select id="pProduct"></select>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:25px;">
+            <div class="form-group">
+                <label>Quantity</label>
+                <input type="number" id="pQty" value="1" min="1">
+            </div>
+            <div class="form-group">
+                <label>Unit Buy Price (GH₵)</label>
+                <input type="number" id="pPrice" value="0.00" step="0.01">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button onclick="closeProcureModal()" class="action-btn">Cancel</button>
+            <button onclick="submitPO()" class="btn-primary">Place Order</button>
+        </div>
+    </div>
+</div>
+
+<script src="../shared-admin.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        loadProcurements();
+        loadSuppliersAndProducts();
+    });
+
+    async function loadProcurements() {
+        const res = await fetch(`${API_URL}/admin/procurements`);
+        const data = await res.json();
+        const tbody = document.querySelector('#procureTable tbody');
+        
+        // Update stats
+        document.getElementById('poCount').textContent = data.length;
+        document.getElementById('pendingCount').textContent = data.filter(p => p.status === 'ordered').length;
+        const total = data.reduce((acc, curr) => acc + parseFloat(curr.total_cost), 0);
+        document.getElementById('totalSpend').textContent = `GH₵ ${total.toFixed(2)}`;
+
+        tbody.innerHTML = data.map(p => `
+            <tr>
+                <td>#PO-${p.id}</td>
+                <td><b>${p.supplier_name}</b></td>
+                <td>${p.linked_product || p.product_name}</td>
+                <td>${p.quantity}</td>
+                <td>GH₵ ${parseFloat(p.unit_price).toFixed(2)}</td>
+                <td><b>GH₵ ${parseFloat(p.total_cost).toFixed(2)}</b></td>
+                <td>${new Date(p.created_at).toLocaleDateString()}</td>
+                <td>
+                    <select class="action-btn" onchange="updateProcStatus(${p.id}, this.value)" ${p.status === 'received' ? 'disabled' : ''}>
+                        <option value="ordered" ${p.status === 'ordered' ? 'selected' : ''}>Ordered</option>
+                        <option value="received" ${p.status === 'received' ? 'selected' : ''}>Received</option>
+                        <option value="cancelled" ${p.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                    </select>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async function loadSuppliersAndProducts() {
+        try {
+            const [supRes, prodRes] = await Promise.all([
+                fetch(`${API_URL}/admin/suppliers`),
+                fetch(`${API_URL.replace('/api', '')}/api/products`)
+            ]);
+            
+            const suppliers = await supRes.json();
+            const products = await prodRes.json();
+
+            if (Array.isArray(suppliers)) {
+                const sSelect = document.getElementById('pSupplier');
+                sSelect.innerHTML = suppliers.filter(s => s.type === 'supplier').map(s => `
+                    <option value="${s.id}">${s.company_name} (${s.product_type})</option>
+                `).join('');
+            }
+
+            if (Array.isArray(products)) {
+                const pSelect = document.getElementById('pProduct');
+                pSelect.innerHTML = products.map(p => `
+                    <option value="${p.id}">${p.name} (Current Stock: ${p.stock_quantity})</option>
+                `).join('');
+            }
+        } catch(e) { console.error("Load error:", e); }
+    }
+
+    function openProcureModal() { document.getElementById('procureModal').style.display = 'flex'; }
+    function closeProcureModal() { document.getElementById('procureModal').style.display = 'none'; }
+
+    async function submitPO() {
+        const supplier_id = document.getElementById('pSupplier').value;
+        const product_id = document.getElementById('pProduct').value;
+        const product_name = document.getElementById('pProduct').options[document.getElementById('pProduct').selectedIndex].text.split(' (')[0];
+        const quantity = document.getElementById('pQty').value;
+        const unit_price = document.getElementById('pPrice').value;
+
+        if(!quantity || !unit_price) return alert("Fill all fields");
+
+        const res = await fetch(`${API_URL}/admin/procurements`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ supplier_id, product_id, product_name, quantity, unit_price })
+        });
+
+        if(res.ok) {
+            closeProcureModal();
+            loadProcurements();
+        } else { alert("Failed to create PO"); }
+    }
+
+    async function updateProcStatus(id, status) {
+        if(!confirm(`Update status to ${status.toUpperCase()}? This may affect inventory records.`)) return;
+        
+        const res = await fetch(`${API_URL}/admin/procurements/${id}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status })
+        });
+
+        if(res.ok) {
+            if(status === 'received') alert("Inventory successfully updated!");
+            loadProcurements();
+        } else { alert("Status update failed"); }
+    }
+</script>
+
+</body>
+</html>

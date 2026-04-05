@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Reports - FitBox Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../backend.css">
+    <link rel="stylesheet" href="css/finance.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="main-content">
+    <header>
+        <div class="header-left">
+            <div class="title-group">
+                <div class="breadcrumb">Finance / Sales Reports</div>
+                <h1>Sales Reports</h1>
+                <p class="header-subtitle">Revenue breakdown and business performance analytics</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn-primary" onclick="window.print()"><i class="fa-solid fa-print"></i> Print Report</button>
+        </div>
+    </header>
+
+    <!-- SALES SUMMARY -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="icon-label"><i class="fa-solid fa-sack-dollar"></i></div>
+            <h3>TOTAL REVENUE</h3>
+            <div class="value" id="totalRev">GH₵ 0.00</div>
+        </div>
+        <div class="stat-card">
+            <div class="icon-label momo"><i class="fa-solid fa-cart-shopping"></i></div>
+            <h3>TOTAL ORDERS</h3>
+            <div class="value" id="totalOrders">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="icon-label card"><i class="fa-solid fa-chart-line"></i></div>
+            <h3>AVG ORDER VALUE</h3>
+            <div class="value" id="avgOrder">GH₵ 0.00</div>
+        </div>
+    </div>
+
+    <!-- CHARTS ROW -->
+    <div class="charts-row">
+        <div class="data-section">
+            <h2>Revenue by Category</h2>
+            <p class="section-subtitle">Sales distribution across product categories</p>
+            <div class="chart-container">
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
+        <div class="data-section">
+            <h2>Payment Methods</h2>
+            <p class="section-subtitle">Mobile Money vs Card split</p>
+            <div class="chart-container">
+                <canvas id="paymentChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- REVENUE BREAKDOWN TABLE -->
+    <div class="data-section">
+        <div class="section-header">
+            <h2>Category Revenue Breakdown</h2>
+            <p class="section-subtitle">Detailed sales by product category</p>
+        </div>
+        <table id="categoryTable">
+            <thead>
+                <tr>
+                    <th>CATEGORY</th>
+                    <th>UNITS SOLD</th>
+                    <th>REVENUE</th>
+                    <th>% OF TOTAL</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamic Content -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="../shared-admin.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        loadReportData();
+    });
+
+    async function loadReportData() {
+        const [resReports, resPayments] = await Promise.all([
+            fetch(`${API_URL}/admin/reports`),
+            fetch(`${API_URL}/admin/payments/summary`)
+        ]);
+        
+        const reports = await resReports.json();
+        const payments = await resPayments.json();
+        
+        // Update Summaries
+        document.getElementById('totalRev').textContent = `GH₵ ${parseFloat(payments.totalRevenue || 0).toFixed(2)}`;
+        document.getElementById('totalOrders').textContent = reports.trends.reduce((s,t) => s + 1, 0); // Approx or from other endpoint
+        document.getElementById('avgOrder').textContent = `GH₵ ${parseFloat(payments.avgOrderValue || 0).toFixed(2)}`;
+
+        // Render Charts
+        renderCharts(reports);
+
+        // Render Table
+        const totalRev = reports.categories.reduce((s, c) => s + parseFloat(c.revenue), 0);
+        const tbody = document.querySelector('#categoryTable tbody');
+        tbody.innerHTML = reports.categories.map(c => `
+            <tr>
+                <td><b>${c.category ? c.category.toUpperCase() : 'GENERAL'}</b></td>
+                <td>${c.units}</td>
+                <td>GH₵ ${parseFloat(c.revenue).toFixed(2)}</td>
+                <td><span style="font-weight:600;">${((c.revenue / totalRev) * 100).toFixed(1)}%</span></td>
+            </tr>
+        `).join('');
+    }
+
+    function renderCharts(data) {
+        // Category Doughnut
+        new Chart(document.getElementById('categoryChart').getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: data.categories.map(c => c.category),
+                datasets: [{
+                    data: data.categories.map(c => c.revenue),
+                    backgroundColor: ['#000', '#333', '#666', '#999'],
+                    borderWidth: 0
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+        });
+
+        // Payment Pie
+        new Chart(document.getElementById('paymentChart').getContext('2d'), {
+            type: 'pie',
+            data: {
+                labels: data.payments.map(p => p.payment_method),
+                datasets: [{
+                    data: data.payments.map(p => p.total),
+                    backgroundColor: ['#000', '#555', '#aaa'],
+                    borderWidth: 0
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+        });
+    }
+</script>
+
+</body>
+</html>

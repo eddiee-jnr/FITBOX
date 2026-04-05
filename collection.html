@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collection - FitBox</title>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="shared.css">
+
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    section {
+      scroll-margin-top: 90px;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      margin-top: 90px;
+      text-align: center;
+      padding: 50px 40px 20px;
+    }
+
+    .header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 42px;
+      font-weight: 600;
+    }
+
+    .header p {
+      color: #777;
+      margin-top: 10px;
+      font-size: 13px;
+      letter-spacing: 1px;
+    }
+
+    /* ── COLLECTION NAV ── */
+    .collection-nav {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-bottom: 20px;
+      padding: 10px 0;
+    }
+
+    .collection-nav a {
+      text-decoration: none;
+      color: #777;
+      font-size: 12px;
+      letter-spacing: 2px;
+      transition: color 0.3s;
+    }
+
+    .collection-nav a:hover {
+      color: black;
+    }
+
+    /* ── FILTERS ── */
+    .filters {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .filters button {
+      margin: 5px;
+      padding: 8px 20px;
+      border: 1px solid #ccc;
+      background: transparent;
+      cursor: pointer;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      letter-spacing: 1px;
+      transition: all 0.25s;
+    }
+
+    .filters button:hover,
+    .filters button.active {
+      background: black;
+      color: white;
+      border-color: black;
+    }
+
+    /* ── COLLECTION SECTION ── */
+    .collection-section {
+      padding: 50px 60px;
+    }
+
+    .collection-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      margin-bottom: 30px;
+      font-weight: 600;
+    }
+
+    /* ── GRID ── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 20px;
+    }
+
+    /* ── PRODUCT CARD ── */
+    .product {
+      background: white;
+      cursor: pointer;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid #eee;
+      transition: box-shadow 0.3s;
+    }
+
+    .product:hover {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .product img {
+      width: 100%;
+      height: 260px;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s;
+    }
+
+    .product:hover img {
+      transform: scale(1.06);
+    }
+
+    .product-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 11px;
+      letter-spacing: 3px;
+      opacity: 0;
+      transition: opacity 0.35s;
+      pointer-events: none;
+    }
+
+    .product:hover .product-overlay {
+      opacity: 1;
+    }
+
+    .product h4 {
+      padding: 12px 12px 4px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .product p {
+      padding: 0 12px 12px;
+      color: #777;
+      font-size: 13px;
+    }
+
+    /* ── MODAL ── */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .modal.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: white;
+      width: 800px;
+      max-width: 95%;
+      padding: 30px;
+      animation: pop 0.35s ease;
+      position: relative;
+    }
+
+    @keyframes pop {
+      from {
+        opacity: 0;
+        transform: scale(0.93);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .close-btn {
+      position: absolute;
+      right: 18px;
+      top: 12px;
+      font-size: 22px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: #555;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+
+    .close-btn:hover {
+      color: black;
+    }
+
+    .modal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+
+    /* ── MODAL IMAGES ── */
+    .modal-images img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .thumbs {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .thumbs img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      cursor: pointer;
+      opacity: 0.55;
+      border: 1px solid transparent;
+      transition: opacity 0.2s, border-color 0.2s;
+    }
+
+    .thumbs img:hover,
+    .thumbs img.active {
+      opacity: 1;
+      border-color: black;
+    }
+
+    /* ── MODAL INFO ── */
+    .modal-info h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    .modal-info .modal-price {
+      color: #555;
+      margin: 10px 0 20px;
+      font-size: 15px;
+    }
+
+    .size-label {
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: #888;
+      margin-bottom: 10px;
+    }
+
+    /* ── SIZE OPTIONS ── */
+    .size-options {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .size-options span {
+      border: 1px solid #ccc;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    .size-options span:hover {
+      border-color: black;
+    }
+
+    .size-options span.active {
+      background: black;
+      color: white;
+      border-color: black;
+    }
+
+    /* ── QUANTITY ── */
+    .quantity {
+      margin: 0 0 22px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .quantity button {
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      border: 1px solid #ccc;
+      background: transparent;
+      font-size: 18px;
+      line-height: 1;
+      font-family: 'Montserrat', sans-serif;
+      transition: all 0.2s;
+    }
+
+    .quantity button:hover {
+      background: black;
+      color: white;
+      border-color: black;
+    }
+
+    .quantity span {
+      font-size: 15px;
+      min-width: 24px;
+      text-align: center;
+    }
+
+    /* ── ADD TO CART ── */
+    .add-cart {
+      width: 100%;
+      padding: 13px;
+      background: black;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      letter-spacing: 2px;
+      transition: opacity 0.2s;
+    }
+
+    .add-cart:hover {
+      opacity: 0.75;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── NAV ── -->
+  <nav>
+    <div class="nav-links nav-left">
+    <a href="index.html">HOME</a>
+    <a href="collection.html">COLLECTION</a>
+    <a href="about.html">ABOUT US</a>
+    <a href="contact.html">CONTACT</a>
+  </div>
+
+    <div class="logo">FITBOX</div>
+
+    <div class="nav-right">
+      <div class="cart-wrapper" onclick="goToCart()">
+        <a href="cart.html">
+          <i class="fa-solid fa-cart-shopping icon"></i>
+        </a>
+        <!-- BADGE -->
+        <span id="cartCount" class="cart-count">0</span>
+      </div>
+      <a href="auth.html" onclick="handleAccountClick(event)" style="display:flex;align-items:center;">
+        <i class="fa-solid fa-user icon"></i>
+      </a>
+    </div>
+  </nav>
+
+  <!-- ── HEADER ── -->
+  <section class="header">
+    <h1>COLLECTIONS</h1>
+    <p>Explore all FitBox drops</p>
+  </section>
+
+  <!-- ── COLLECTION NAV TABS ── -->
+  <div class="collection-nav">
+    <a href="#maestro">MAESTRO</a>
+    <a href="#legacy">LEGACY</a>
+    <a href="#custom">CUSTOM</a>
+  </div>
+
+  <!-- ── FILTERS ── -->
+  <div class="filters">
+    <button class="active" onclick="filterProducts('all', this)">ALL</button>
+    <button onclick="filterProducts('hoodie', this)">HOODIES</button>
+    <button onclick="filterProducts('tee', this)">TEES</button>
+    <button onclick="filterProducts('pants', this)">PANTS</button>
+  </div>
+
+  <!-- ── QUICK VIEW MODAL ── -->
+  <div id="quickView" class="modal">
+    <div class="modal-box" id="modalBox">
+      <button class="close-btn" id="closeBtn" aria-label="Close">&#x2715;</button>
+      <div class="modal-grid">
+        <div class="modal-images">
+          <img id="mainImg" src="" alt="">
+          <div class="thumbs" id="thumbsContainer"></div>
+        </div>
+        <div class="modal-info">
+          <h2 id="modalTitle"></h2>
+          <p class="modal-price" id="modalPrice"></p>
+          <p class="size-label">SELECT SIZE</p>
+          <div class="size-options">
+            <span onclick="selectSize(this)">S</span>
+            <span onclick="selectSize(this)">M</span>
+            <span onclick="selectSize(this)">L</span>
+            <span onclick="selectSize(this)">XL</span>
+          </div>
+          <div class="quantity">
+            <button onclick="changeQty(-1)">&#8722;</button>
+            <span id="qty">1</span>
+            <button onclick="changeQty(1)">+</button>
+          </div>
+          <button class="add-cart" onclick="addToCart()">ADD TO CART</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MAESTRO SECTION ── -->
+  <section id="maestro" class="collection-section">
+    <h2 class="collection-title">THE MAESTRO</h2>
+    <div class="grid" id="maestroGrid"></div>
+  </section>
+
+  <!-- ── LEGACY SECTION ── -->
+  <section id="legacy" class="collection-section">
+    <h2 class="collection-title">THE LEGACY CAPSULE</h2>
+    <div class="grid" id="legacyGrid"></div>
+  </section>
+
+  <!-- ── CUSTOM SECTION ── -->
+  <section id="custom" class="collection-section">
+    <h2 class="collection-title">CUSTOM WEARS</h2>
+    <div class="grid" id="customGrid"></div>
+  </section>
+
+  <!-- FOOTER -->
+<footer class="footer">
+
+  <div class="footer-container">
+
+    <!-- CONTACT -->
+    <div class="footer-col">
+      <h4>CONTACT</h4>
+      <p>Premium streetwear brand built for style and confidence.</p>
+
+      <div class="socials">
+        <a href="#"><svg viewBox="0 0 24 24"><path d="M7 2C4.2 2 2 4.2 2 7v10c0 2.8 2.2 5 5 5h10c2.8 0 5-2.2 5-5V7c0-2.8-2.2-5-5-5H7zm5 5a5 5 0 110 10 5 5 0 010-10zm6.5-.8a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"/></svg></a>
+        <a href="#"><svg viewBox="0 0 24 24"><path d="M22 5.9c-.8.4-1.6.6-2.4.7.9-.5 1.5-1.3 1.8-2.2-.8.5-1.7.8-2.6 1-1.6-1.7-4.3-1.6-5.8.2-1 1.2-1.3 2.8-.8 4.3-3.5-.2-6.6-1.8-8.7-4.5-1.1 1.9-.5 4.3 1.3 5.5-.7 0-1.3-.2-1.9-.5 0 2 1.4 3.8 3.4 4.2-.6.2-1.2.2-1.8.1.5 1.7 2.1 2.9 3.9 2.9-1.5 1.2-3.4 1.8-5.3 1.8H2c2 1.3 4.3 2 6.7 2 8 0 12.4-6.7 12.4-12.4v-.6c.8-.6 1.5-1.3 2-2.1z"/></svg></a>
+        <a href="#"><svg viewBox="0 0 24 24"><path d="M22 12a10 10 0 10-11.5 9.9v-7H8v-3h2.5V9.5c0-2.5 1.5-3.9 3.7-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.7-1.6 1.5V12H17l-.5 3h-2.8v7A10 10 0 0022 12z"/></svg></a>
+      </div>
+    </div>
+
+    <!-- INFORMATION -->
+    <div class="footer-col">
+      <h4>INFORMATION</h4>
+      <ul>
+        <li>New Collection</li>
+        <li>Exclusive Product</li>
+        <li>Custom Wears</li>
+        <li>Our Story</li>
+      </ul>
+    </div>
+
+    <!-- NEWSLETTER -->
+    <div class="footer-col">
+      <h4>NEWSLETTER</h4>
+      <p>Subscribe to get updates on offers, discounts and new arrivals.</p>
+      <div class="newsletter">
+        <input type="email" id="newsletterEmail" placeholder="Enter your email">
+        <button onclick="subscribe()">→</button>
+      </div>
+      <p id="newsletterMsg" style="margin-top:10px; font-size:12px;"></p>
+    </div>
+
+    <!-- ADDRESS -->
+    <div class="footer-col">
+      <h4>ADDRESS</h4>
+      <p>4th Dr Akwei Onufugbortsui St</p>
+      <p>Ghana</p>
+      <p>fitboxclothing@gmail.com</p>
+      <p>+233 552 484 014</p>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    © 2026 FITBOX. All rights reserved.
+  </div>
+
+</footer>
+
+  <div id="toast" class="toast">Added to cart</div>
+
+  <script>
+
+    let products = [];
+    let selectedSize = "";
+    let quantity = 1;
+    let currentProduct = null;
+
+    async function fetchProducts() {
+      try {
+        const response = await fetch("http://localhost:3000/api/products");
+        const data = await response.json();
+        
+        // Map database fields to frontend fields
+        products = data.map(p => ({
+          id: p.id,
+          name: p.name,
+          price: p.price,
+          img: p.image_url,
+          category: p.category,
+          section: p.section,
+          stock: p.stock_quantity,
+          extraImages: p.extra_images ? p.extra_images.split(',') : []
+        }));
+
+        // Load into grids
+        const grids = ["maestroGrid", "legacyGrid", "customGrid"];
+        grids.forEach(g => document.getElementById(g).innerHTML = ""); // Clear first
+        loadProducts("maestroGrid", "maestro");
+        loadProducts("legacyGrid", "legacy");
+        loadProducts("customGrid", "custom");
+      } catch (err) {
+        console.error("Failed to fetch products:", err);
+      }
+    }
+
+    // Call fetch on load
+    window.addEventListener('load', fetchProducts);
+
+
+    /* ── LOAD PRODUCTS ──
+       Filters by section so each grid only gets its own products.
+       Every product image path maps directly to your images/ folder. */
+    function loadProducts(gridId, sectionName) {
+      const grid = document.getElementById(gridId);
+      const sectionItems = products.filter(p => p.section === sectionName);
+
+      sectionItems.forEach(p => {
+        const div = document.createElement("div");
+        const isOut = p.stock <= 0;
+        div.className = `product ${isOut ? 'product-out-of-stock' : ''}`;
+        div.dataset.category = p.category;
+
+        div.innerHTML = `
+          ${isOut ? '<div class="sold-out-badge">SOLD OUT</div>' : ''}
+          <img src="${p.img}" alt="${p.name}"
+               onerror="this.src='https://placehold.co/400x300?text=No+Image'">
+          <div class="product-overlay">QUICK VIEW</div>
+          <h4>${p.name}</h4>
+          <p>GH₵ ${p.price}</p>
+        `;
+
+        div.addEventListener("click", () => openModal(p));
+        grid.appendChild(div);
+      });
+    }
+
+
+    /* ── OPEN MODAL ── */
+    function openModal(p) {
+      currentProduct = p;
+
+      document.getElementById("mainImg").src = p.img;
+      document.getElementById("mainImg").alt = p.name;
+      document.getElementById("modalTitle").textContent = p.name;
+      document.getElementById("modalPrice").textContent = "GH₵ " + p.price;
+
+      const addBtn = document.querySelector(".add-cart");
+      if (p.stock <= 0) {
+          addBtn.textContent = "OUT OF STOCK";
+          addBtn.style.background = "#555";
+          addBtn.disabled = true;
+      } else {
+          addBtn.textContent = "ADD TO CART";
+          addBtn.style.background = "black";
+          addBtn.disabled = false;
+      }
+
+      /* Reset */
+      quantity = 1;
+      document.getElementById("qty").textContent = 1;
+      selectedSize = "";
+      document.querySelectorAll(".size-options span")
+        .forEach(s => s.classList.remove("active"));
+
+      /* Thumbnails — current product + (extraImages OR 2 related products) */
+      const thumbsContainer = document.getElementById("thumbsContainer");
+      thumbsContainer.innerHTML = "";
+
+      let thumbsData = [{ img: p.img, name: p.name }];
+
+      if (p.extraImages && p.extraImages.length > 0) {
+        p.extraImages.forEach(extImg => {
+          thumbsData.push({ img: extImg.trim(), name: p.name });
+        });
+      } else {
+        const related = products
+          .filter(tp => tp.section === p.section && tp.img !== p.img)
+          .slice(0, 2);
+        related.forEach(rp => thumbsData.push({ img: rp.img, name: rp.name }));
+      }
+
+      thumbsData.forEach((tp, i) => {
+        const img = document.createElement("img");
+        img.src = tp.img;
+        img.alt = tp.name;
+        img.onerror = () => { img.src = "https://placehold.co/100x100?text=N/A"; };
+        if (i === 0) img.classList.add("active");
+
+        img.addEventListener("click", () => {
+          document.getElementById("mainImg").src = tp.img;
+          thumbsContainer.querySelectorAll("img")
+            .forEach(t => t.classList.remove("active"));
+          img.classList.add("active");
+        });
+
+        thumbsContainer.appendChild(img);
+      });
+
+      document.getElementById("quickView").classList.add("open");
+    }
+
+    /* ── CLOSE MODAL ── */
+    function closeModal() {
+      document.getElementById("quickView").classList.remove("open");
+    }
+
+    document.getElementById("closeBtn").addEventListener("click", closeModal);
+
+    document.getElementById("quickView").addEventListener("click", (e) => {
+      if (e.target === document.getElementById("quickView")) closeModal();
+    });
+
+
+    /* ── SIZE SELECTION ── */
+    function selectSize(el) {
+      document.querySelectorAll(".size-options span")
+        .forEach(s => s.classList.remove("active"));
+      el.classList.add("active");
+      selectedSize = el.textContent;
+    }
+
+
+    /* ── QUANTITY ── */
+    function changeQty(val) {
+      quantity = Math.max(1, quantity + val);
+      document.getElementById("qty").textContent = quantity;
+    }
+
+
+    /* ── ADD TO CART ── */
+    function addToCart() {
+      if (!selectedSize) {
+        alert("Please select a size.");
+        return;
+      }
+
+      const item = {
+        id: currentProduct.id,
+        name: currentProduct.name,
+        price: currentProduct.price,
+        img: currentProduct.img,
+        size: selectedSize,
+        qty: quantity
+      };
+
+      const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+      cart.push(item);
+      localStorage.setItem("cart", JSON.stringify(cart));
+
+      const toast = document.getElementById("toast");
+      toast.textContent = `Added to cart: ${item.name}`;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 3000);
+      updateCartBadge();
+    }
+
+
+    /* ── FILTER ── */
+    function filterProducts(category, btn) {
+      document.querySelectorAll(".filters button")
+        .forEach(b => b.classList.remove("active"));
+      if (btn) btn.classList.add("active");
+
+      document.querySelectorAll(".product").forEach(item => {
+        const show = category === "all" || item.dataset.category === category;
+        item.style.display = show ? "block" : "none";
+      });
+    }
+
+
+    /* ── SMOOTH SCROLL FOR NAV TABS ── */
+    document.querySelectorAll(".collection-nav a").forEach(link => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        const target = document.querySelector(link.getAttribute("href"));
+        if (target) target.scrollIntoView({ behavior: "smooth" });
+      });
+    });
+
+
+    /* ── SCROLL TO HASH ON PAGE LOAD ──
+       Handles arriving via collection.html#legacy from home page */
+    window.addEventListener("load", () => {
+      if (window.location.hash) {
+        const target = document.querySelector(window.location.hash);
+        if (target) {
+          setTimeout(() => target.scrollIntoView({ behavior: "smooth" }), 100);
+        }
+      }
+    });
+
+
+    /* ── ACCOUNT CHECK ── */
+    function handleAccountClick(e) {
+      e.preventDefault();
+      const isLoggedIn = localStorage.getItem("loggedIn");
+      if (isLoggedIn === "true") {
+        window.location.href = "profile.html";
+      } else {
+        window.location.href = "auth.html";
+      }
+    }
+
+    function updateCartBadge() {
+      const c = JSON.parse(localStorage.getItem('cart')) || [];
+      const total = c.reduce((sum, item) => sum + item.qty, 0);
+      const badge = document.getElementById('cartCount');
+      if (badge) {
+        if (total > 0) {
+          badge.style.display = 'block';
+          badge.textContent = total;
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+    }
+
+    window.addEventListener('load', updateCartBadge);
+
+    const links = document.querySelectorAll(".nav-left a");
+    links.forEach(link => {
+      if (window.location.href.includes(link.getAttribute("href"))) {
+        link.classList.add("active");
+      }
+    });
+  </script>
+
+</body>
+
+</html>

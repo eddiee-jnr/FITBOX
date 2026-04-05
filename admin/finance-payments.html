@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Log - FitBox Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../backend.css">
+    <link rel="stylesheet" href="css/finance.css">
+</head>
+<body>
+
+<div class="main-content">
+    <header>
+        <div class="header-left">
+            <div class="title-group">
+                <div class="breadcrumb">Finance / Payments</div>
+                <h1>Payment Log</h1>
+                <p class="header-subtitle">Complete transaction history for orders and bookings</p>
+            </div>
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="Search by ID..." onkeyup="filterPayments(this)">
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn-primary" onclick="alert('Exporting Payment_Log_2026.csv')"><i class="fa-solid fa-file-export"></i> Export CSV</button>
+        </div>
+    </header>
+
+    <!-- PAYMENT SUMMARY -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="icon-label"><i class="fa-solid fa-coins"></i></div>
+            <h3>TOTAL REVENUE</h3>
+            <div class="value" id="totalRev">GH₵ 0.00</div>
+        </div>
+        <div class="stat-card">
+            <div class="icon-label momo"><i class="fa-solid fa-mobile-screen-button"></i></div>
+            <h3>MOBILE MONEY</h3>
+            <div class="value" id="momoRev">GH₵ 0.00</div>
+        </div>
+        <div class="stat-card">
+            <div class="icon-label card"><i class="fa-solid fa-credit-card"></i></div>
+            <h3>CARD PAYMENTS</h3>
+            <div class="value" id="cardRev">GH₵ 0.00</div>
+        </div>
+        <div class="stat-card">
+            <div class="icon-label avg"><i class="fa-solid fa-chart-line"></i></div>
+            <h3>AVG ORDER VALUE</h3>
+            <div class="value" id="avgOrder">GH₵ 0.00</div>
+        </div>
+    </div>
+
+    <!-- TRANSACTIONS TABLE -->
+    <div class="data-section">
+        <div class="section-header">
+            <h2>All Transactions</h2>
+            <p id="transCountLabel" class="section-subtitle">0 transactions found</p>
+        </div>
+        <table id="paymentsTable">
+            <thead>
+                <tr>
+                    <th>ORDER ID</th>
+                    <th>CUSTOMER</th>
+                    <th>ITEMS</th>
+                    <th>AMOUNT</th>
+                    <th>METHOD</th>
+                    <th>DATE</th>
+                    <th>ORDER STATUS</th>
+                    <th>PAYMENT STATUS</th>
+                    <th>UPDATE PAYMENT</th>
+                    <th>INVOICE</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamic Content -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+    <!-- INVOICE MODAL -->
+    <div id="invoiceModal" class="modal">
+        <div class="modal-content">
+            <div id="invoicePrintArea">
+                <div class="invoice-header">
+                    <div class="invoice-logo">
+                        <h1>FITBOX</h1>
+                        <p>ACCRA, GHANA | PREMIUM STREETWEAR</p>
+                    </div>
+                    <div class="invoice-meta">
+                        <h2>INVOICE</h2>
+                        <p id="invId"></p>
+                        <span id="invDate"></span>
+                    </div>
+                </div>
+
+                <div class="bill-to-grid">
+                    <div>
+                        <p class="bill-to-label">Bill To</p>
+                        <p id="invCustomerName" class="customer-name"></p>
+                        <p id="invCustomerEmail" class="customer-meta"></p>
+                        <p id="invCustomerPhone" class="customer-meta"></p>
+                    </div>
+                    <div>
+                        <p class="bill-to-label">Shipping Address</p>
+                        <p id="invAddress" class="shipping-address"></p>
+                    </div>
+                </div>
+
+                <table class="invoice-table">
+                    <thead>
+                        <tr>
+                            <th>DESCRIPTION</th>
+                            <th style="text-align: center;">QTY</th>
+                            <th style="text-align: right;">PRICE</th>
+                            <th style="text-align: right;">TOTAL</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invItems">
+                        <!-- Items injected here -->
+                    </tbody>
+                </table>
+
+                <div class="invoice-total-section">
+                    <div class="total-box">
+                        <div class="total-row">
+                            <span class="label">SUBTOTAL</span>
+                            <span id="invSubtotal"></span>
+                        </div>
+                        <div class="total-row">
+                            <span class="label">DELIVERY</span>
+                            <span id="invDelivery"></span>
+                        </div>
+                        <div class="grand-total">
+                            <span>TOTAL</span>
+                            <span id="invTotal"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="invoice-footer-note">
+                    THANK YOU FOR SHOPPING AT FITBOX. YOUR SUPPORT DEFINES OUR LEGACY.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeInvoice()" class="action-btn">Close</button>
+                <button onclick="printInvoice()" class="btn-primary" style="background:#fff; color:#000;"><i class="fa-solid fa-print"></i> Print Invoice</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="../shared-admin.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        loadPayments();
+        loadSummary();
+    });
+
+    async function loadSummary() {
+        try {
+            const res = await fetch(`${API_URL}/admin/payments/summary`);
+            if(!res.ok) throw new Error("Summary failed");
+            const data = await res.json();
+            document.getElementById('totalRev').textContent = `GH₵ ${parseFloat(data.totalRevenue || 0).toFixed(2)}`;
+            document.getElementById('momoRev').textContent = `GH₵ ${parseFloat(data.momoRevenue || 0).toFixed(2)}`;
+            document.getElementById('cardRev').textContent = `GH₵ ${parseFloat(data.cardRevenue || 0).toFixed(2)}`;
+            document.getElementById('avgOrder').textContent = `GH₵ ${parseFloat(data.avgOrderValue || 0).toFixed(2)}`;
+        } catch(e) { console.error(e); }
+    }
+
+    async function updatePaymentStatus(orderId, status) {
+        if(!status) return;
+        try {
+            const res = await fetch(`${API_URL}/admin/payments/${orderId}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status })
+            });
+            if(res.ok) {
+                loadPayments();
+                loadSummary();
+            } else {
+                alert("Failed to update payment status");
+            }
+        } catch(e) { console.error(e); }
+    }
+
+    async function loadPayments() {
+        try {
+            const res = await fetch(`${API_URL}/admin/orders`);
+            const data = await res.json();
+            const tbody = document.querySelector('#paymentsTable tbody');
+            document.getElementById('transCountLabel').textContent = `${data.length} transactions found`;
+            
+            tbody.innerHTML = data.map(o => `
+                <tr>
+                    <td>#${o.id}</td>
+                    <td><b>${o.customer_name || 'Guest'}</b></td>
+                    <td style="max-width:200px;"><small>${o.items_summary}</small></td>
+                    <td><b>GH₵ ${o.total_amount}</b></td>
+                    <td><span class="badge" style="background:#f0f0f0; border-radius:20px; color:#333; text-transform:capitalize;">${o.payment_method || 'N/A'}</span></td>
+                    <td>${new Date(o.created_at).toLocaleDateString()}</td>
+                    <td><span class="badge ${o.status}">${o.status}</span></td>
+                    <td><span class="badge ${o.payment_status || 'pending'}">${o.payment_status || 'pending'}</span></td>
+                    <td>
+                        <select class="action-btn" onchange="updatePaymentStatus(${o.id}, this.value)" style="font-size:10px; width:100px;">
+                            <option value="">Update...</option>
+                            <option value="pending" ${o.payment_status === 'pending' ? 'selected' : ''}>Pending</option>
+                            <option value="success" ${o.payment_status === 'success' ? 'selected' : ''}>Success</option>
+                            <option value="failed" ${o.payment_status === 'failed' ? 'selected' : ''}>Failed</option>
+                        </select>
+                    </td>
+                    <td><button class="action-btn" onclick="viewInvoice(${o.id})"><i class="fa-solid fa-file-pdf"></i></button></td>
+                </tr>
+            `).join('');
+        } catch(e) { console.error(e); }
+    }
+
+    async function viewInvoice(id) {
+        try {
+            const res = await fetch(`${API_URL}/admin/orders/${id}`);
+            if (!res.ok) throw new Error("Order not found or server error");
+            
+            const o = await res.json();
+            if (!o || !o.items) throw new Error("Invalid order data received");
+            
+            document.getElementById('invId').textContent = `ORDER ID: #FB-${o.id}`;
+            document.getElementById('invDate').textContent = `DATE: ${new Date(o.created_at).toLocaleDateString()}`;
+            document.getElementById('invCustomerName').textContent = o.customer_name || 'Guest Customer';
+            document.getElementById('invCustomerEmail').textContent = o.customer_email || '-';
+            document.getElementById('invCustomerPhone').textContent = o.phone_number || '-';
+            document.getElementById('invAddress').textContent = o.shipping_address || 'No address provided';
+            
+            const itemBody = document.getElementById('invItems');
+            itemBody.innerHTML = o.items.map(i => `
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <td style="padding: 15px 0;">
+                        <p style="margin: 0; font-weight: 500;">${i.product_name || 'Removed Product'}</p>
+                        <p style="margin: 5px 0 0; font-size: 10px; opacity: 0.5;">SIZE: ${i.size || 'N/A'}</p>
+                    </td>
+                    <td style="padding: 15px 0; text-align: center; opacity: 0.7;">${i.quantity}</td>
+                    <td style="padding: 15px 0; text-align: right; opacity: 0.7;">GH₵ ${parseFloat(i.price_at_time || 0).toFixed(2)}</td>
+                    <td style="padding: 15px 0; text-align: right; font-weight: 600;">GH₵ ${(i.quantity * (i.price_at_time || 0)).toFixed(2)}</td>
+                </tr>
+            `).join('');
+            
+            const subtotal = o.items.reduce((acc, i) => acc + (i.quantity * (i.price_at_time || 0)), 0);
+            document.getElementById('invSubtotal').textContent = `GH₵ ${subtotal.toFixed(2)}`;
+            document.getElementById('invDelivery').textContent = `GH₵ ${parseFloat(o.delivery_fee || 0).toFixed(2)}`;
+            document.getElementById('invTotal').textContent = `GH₵ ${parseFloat(o.total_amount || 0).toFixed(2)}`;
+            
+            document.getElementById('invoiceModal').style.display = 'flex';
+        } catch(e) { 
+            console.error("[INVOICE ERROR]", e); 
+            alert("Error: " + e.message); 
+        }
+    }
+
+    function closeInvoice() {
+        document.getElementById('invoiceModal').style.display = 'none';
+    }
+
+    function printInvoice() {
+        const idText = document.getElementById('invId').textContent;
+        const id = idText.split('#FB-')[1];
+        if(!id) return alert("Invalid Order ID");
+        
+        window.open(`finance-invoice.html?id=${id}`, '_blank');
+    }
+
+    function filterPayments(input) {
+        const filter = input.value.toUpperCase();
+        const rows = document.getElementById("paymentsTable").getElementsByTagName("tr");
+        for (let i = 1; i < rows.length; i++) {
+            const text = rows[i].textContent.toUpperCase();
+            rows[i].style.display = text.indexOf(filter) > -1 ? "" : "none";
+        }
+    }
+</script>
+
+</body>
+</html>

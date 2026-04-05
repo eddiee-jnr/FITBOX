@@ -1,0 +1,26 @@
+# Node.js
+node_modules/
+backend/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment Variables
+.env
+backend/.env
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Documentation
+Documentation_Progress.md
+temp_docs/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Gitignore for FitBox E-Business System

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Feedback - FitBox Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../backend.css">
+    <link rel="stylesheet" href="css/crm.css">
+</head>
+<body>
+
+<div class="main-content">
+    <header>
+        <div class="header-left">
+            <div class="title-group">
+                <div class="breadcrumb">CRM / Feedback</div>
+                <h1>Customer Feedback</h1>
+                <p class="header-subtitle">Monitor and respond to customer enquiries and message history</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn-primary" onclick="window.location.reload()"><i class="fa-solid fa-rotate"></i> Refresh Feedback</button>
+        </div>
+    </header>
+
+    <!-- FEEDBACK TABLE -->
+    <div class="data-section">
+        <div class="section-header">
+            <h2>Inbox</h2>
+            <p id="enqCountLabel" class="section-subtitle">0 enquiries recorded</p>
+        </div>
+        <table id="feedbackTable">
+            <thead>
+                <tr>
+                    <th>DATE</th>
+                    <th>CUSTOMER</th>
+                    <th>SUBJECT</th>
+                    <th>MESSAGE</th>
+                    <th>STATUS</th>
+                    <th>ACTION</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamic Content -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="../shared-admin.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        loadFeedback();
+    });
+
+    async function loadFeedback() {
+        const res = await fetch(`${API_URL}/admin/feedback`);
+        const data = await res.json();
+        const tbody = document.querySelector('#feedbackTable tbody');
+        document.getElementById('enqCountLabel').textContent = `${data.length} enquiries recorded`;
+        
+        tbody.innerHTML = data.map(f => `
+            <tr>
+                <td>${new Date(f.created_at).toLocaleDateString()}</td>
+                <td><b>${f.name}</b> <br> <small>${f.email}</small></td>
+                <td>${f.subject}</td>
+                <td><small>${f.message}</small></td>
+                <td><span class="badge ${f.status || 'new'}">${f.status || 'new'}</span></td>
+                <td>
+                    <button class="action-btn" onclick="alert('Viewing feedback details for ${f.name}')">View</button>
+                    <button class="action-btn" onclick="alert('Replying to enquiry...')"><i class="fa-solid fa-reply"></i></button>
+                </td>
+            </tr>
+        `).join('');
+    }
+</script>
+
+</body>
+</html>

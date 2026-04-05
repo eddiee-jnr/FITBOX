@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Authentication</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+
+<style>
+
+/* BACKGROUND */
+body {
+  height: 100vh;
+  background: linear-gradient(135deg, #FAF7F2, #EAEAEA);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* MAIN CONTAINER */
+.container {
+  width: 1000px;
+  height: 550px;
+  display: flex;
+  background: #fff;
+  overflow: hidden;
+  position: relative;
+}
+
+/* IMAGE PANEL */
+.image-panel {
+  width: 50%;
+  background: url('images/authpic1.jfif') center/cover;
+  position: relative;
+}
+
+.image-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+}
+
+/* FORM PANEL */
+.form-panel {
+  width: 50%;
+  display: flex;
+  align-items: center;
+  padding: 60px;
+  border-left: 1px solid #eee;
+  position: relative;
+  overflow: hidden;
+}
+
+/* LOGO */
+.form-logo {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+
+  /* ANIMATION */
+  opacity: 0;
+  transform: translateY(-20px);
+  animation: logoFade 1s ease forwards;
+  animation-delay: 0.3s;
+
+  transition: all 0.3s ease;
+}
+
+.form-logo:hover {
+  transform: scale(1.08);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+}
+
+/* OPTIONAL GLOW (premium subtle) */
+@keyframes glow {
+  0% { box-shadow: 0 0 0 rgba(0,0,0,0.2); }
+  50% { box-shadow: 0 0 20px rgba(0,0,0,0.3); }
+  100% { box-shadow: 0 0 0 rgba(0,0,0,0.2); }
+}
+
+/* FADE IN */
+@keyframes logoFade {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* FORMS */
+.form {
+  position: absolute;
+  width: 100%;
+  max-width: 320px;
+  left: 60px;
+  transition: all 0.6s ease;
+}
+
+.signup {
+  opacity: 0;
+  transform: translateX(-80px);
+  pointer-events: none;
+}
+
+.container.active .signin {
+  opacity: 0;
+  transform: translateX(-60px);
+}
+
+.container.active .signup {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: all;
+}
+
+/* TEXT */
+h2 {
+  font-family: 'Playfair Display', serif;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: #777;
+  margin-bottom: 25px;
+}
+
+/* INPUTS */
+input {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 15px;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  outline: none;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+input:focus {
+  border-bottom: 1px solid black;
+}
+
+/* BUTTON */
+button {
+  width: 100%;
+  padding: 14px;
+  background: #0D0D0D;
+  color: white;
+  border: none;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  background: black;
+}
+
+/* SWITCH TEXT */
+.switch {
+  margin-top: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #555;
+}
+
+/* ERROR */
+.error {
+  font-size: 12px;
+  color: red;
+  margin-bottom: 10px;
+}
+
+/* OVERLAY TEXT */
+.overlay-text {
+  position: absolute;
+  top: 60px;
+  left: 60px;
+  color: white;
+  z-index: 2;
+  transition: 0.5s;
+}
+
+.overlay-text h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+}
+
+.overlay-text p {
+  font-size: 14px;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container" id="container">
+
+  <!-- IMAGE -->
+  <div class="image-panel" id="imagePanel">
+    <div class="overlay-text" id="overlayText">
+      <h1>Welcome Back</h1>
+      <p>Sign in to continue</p>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <div class="form-panel">
+
+    <!--  LOGO -->
+	<a href="index.html">
+    <img src="images/fitboxlogo.jpg" class="form-logo">
+    </a>
+
+    <!-- SIGN IN -->
+    <div class="form signin">
+      <h2>Sign In</h2>
+      <div class="subtitle">Access your account</div>
+
+      <input type="email" id="loginEmail" placeholder="Email">
+      <input type="password" id="loginPassword" placeholder="Password">
+      <div id="loginError" class="error"></div>
+
+      <button onclick="login()">SIGN IN</button>
+
+      <div class="switch" onclick="toggle()">Don’t have an account? <b><u>Sign up</u></b></div>
+    </div>
+
+    <!-- SIGN UP -->
+    <div class="form signup">
+      <h2>Create Account</h2>
+      <div class="subtitle">Join FitBox</div>
+
+      <input type="text" id="name" placeholder="Full Name">
+      <input type="email" id="signupEmail" placeholder="Email">
+      <input type="password" id="signupPassword" placeholder="Password">
+      <div id="signupError" class="error"></div>
+
+      <button onclick="signup()">SIGN UP</button>
+
+      <div class="switch" onclick="toggle()">Already have an account? <u><b>Sign in</b></u></div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+const container = document.getElementById("container");
+const overlayText = document.getElementById("overlayText");
+const imagePanel = document.getElementById("imagePanel");
+
+/* SWITCH ANIMATION + TEXT */
+function toggle() {
+  container.classList.toggle("active");
+
+  if (container.classList.contains("active")) {
+    overlayText.innerHTML = `
+      <h1>Join Us</h1>
+      <p>Create your account</p>
+    `;
+    imagePanel.style.backgroundImage = "url('images/authpic2.jfif')";
+  } else {
+    overlayText.innerHTML = `
+      <h1>Welcome Back</h1>
+      <p>Sign in to continue</p>
+    `;
+    imagePanel.style.backgroundImage = "url('images/authpic1.jfif')";
+  }
+}
+
+/* VALIDATION */
+function validateEmail(email) {
+  return email.includes("@") && email.includes(".");
+}
+
+/* API CONFIG */
+const API_URL = "http://localhost:3000/api";
+
+/* SAVE USER */
+async function signup() {
+  let name = document.getElementById("name").value;
+  let email = document.getElementById("signupEmail").value;
+  let password = document.getElementById("signupPassword").value;
+  let error = document.getElementById("signupError");
+
+  if (!name || !email || !password) {
+    error.textContent = "All fields are required";
+    return;
+  }
+
+  if (password.length < 6) {
+    error.textContent = "Password too short";
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      error.textContent = data.error || "Registration failed";
+      return;
+    }
+
+    alert("Account created ✅");
+    
+    // Clear previous sessions to prevent mix-ups
+    localStorage.removeItem("admin_user");
+    localStorage.removeItem("customer_user");
+    
+    // Store only as customer (registration is always customer)
+    localStorage.setItem("customer_user", JSON.stringify(data));
+    localStorage.setItem("customer_loggedIn", "true");
+    window.location.href = "index.html";
+  } catch (err) {
+    error.textContent = "Server connection failed";
+  }
+}
+
+/* LOGIN */
+async function login() {
+  let email = document.getElementById("loginEmail").value;
+  let password = document.getElementById("loginPassword").value;
+  let error = document.getElementById("loginError");
+
+  try {
+    const response = await fetch(`${API_URL}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      error.textContent = data.error || "Invalid credentials";
+      return;
+    }
+
+    // Clear previous sessions before setting the new one
+    localStorage.removeItem("admin_user");
+    localStorage.removeItem("customer_user");
+    localStorage.removeItem("admin_loggedIn");
+    localStorage.removeItem("customer_loggedIn");
+    
+    alert("Login successful");
+    
+    // Redirect and store based on role
+    if (data.role === 'admin') {
+      localStorage.setItem("admin_user", JSON.stringify(data));
+      localStorage.setItem("admin_loggedIn", "true");
+      window.location.href = "admin-dashboard.html";
+    } else {
+      localStorage.setItem("customer_user", JSON.stringify(data));
+      localStorage.setItem("customer_loggedIn", "true");
+      window.location.href = "index.html";
+    }
+  } catch (err) {
+    error.textContent = "Server connection failed";
+  }
+}
+
+</script>
+
+</body>
+</html>

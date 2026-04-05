@@ -1,0 +1,329 @@
+/* Finance Module Styles */
+
+/* ── STATS CARDS OVERRIDES ── */
+.stats-grid .stat-card .icon-label.momo { color: #38a169; }
+.stats-grid .stat-card .icon-label.card { color: #3182ce; }
+.stats-grid .stat-card .icon-label.avg { color: #b7791f; }
+
+/* ── CHARTS ── */
+.charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.chart-container {
+    height: 300px;
+    position: relative;
+}
+
+/* ── INVOICE MODAL (Mission Control Style) ── */
+#invoiceModal .modal-content {
+    width: 680px;
+    padding: 0;
+    overflow: hidden;
+    background: #000;
+    color: #fff;
+}
+
+#invoicePrintArea {
+    padding: 45px;
+    min-height: 600px;
+}
+
+.invoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 50px;
+}
+
+.invoice-logo h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px;
+    letter-spacing: 4px;
+    margin: 0;
+}
+
+.invoice-logo p {
+    font-size: 10px;
+    letter-spacing: 2px;
+    opacity: 0.6;
+    margin-top: 10px;
+}
+
+.invoice-meta {
+    text-align: right;
+}
+
+.invoice-meta h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    letter-spacing: 2px;
+    opacity: 0.8;
+    margin: 0;
+}
+
+.invoice-meta p {
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.invoice-meta span {
+    font-size: 10px;
+    opacity: 0.5;
+}
+
+.bill-to-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.bill-to-label {
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: #aaa;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+}
+
+.customer-name {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 5px 0;
+}
+
+.customer-meta {
+    font-size: 12px;
+    opacity: 0.7;
+    margin: 0;
+}
+
+.shipping-address {
+    font-size: 13px;
+    line-height: 1.6;
+    opacity: 0.8;
+    margin: 0;
+}
+
+.invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 60px;
+}
+
+.invoice-table thead tr {
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.invoice-table th {
+    padding: 15px 0;
+    color: #aaa;
+    font-size: 10px;
+    letter-spacing: 1px;
+}
+
+.invoice-table td {
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.item-desc p { margin: 0; font-weight: 500; }
+.item-desc small { margin: 5px 0 0; font-size: 10px; opacity: 0.5; display: block; }
+
+.invoice-total-section {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.total-box {
+    width: 250px;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 13px;
+}
+
+.total-row .label { opacity: 0.6; }
+
+.grand-total {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.invoice-footer-note {
+    margin-top: 60px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding-top: 30px;
+    text-align: center;
+    opacity: 0.4;
+    font-size: 10px;
+    letter-spacing: 1px;
+}
+
+.modal-footer {
+    padding: 20px 40px;
+    background: #111;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+/* ── INVOICE PAGE (finance-invoice.html) ── */
+.invoice-page-container {
+    max-width: 680px;
+    margin: 0 auto;
+    border: 1px solid #eee;
+    padding: 40px;
+}
+
+.invoice-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 40px;
+}
+
+.invoice-page-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 600;
+    letter-spacing: 2px;
+}
+
+.invoice-page-title {
+    text-align: right;
+}
+
+.invoice-page-title h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 300;
+    letter-spacing: 4px;
+    color: #555;
+}
+
+.invoice-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.invoice-detail-block h4 {
+    margin: 0 0 10px 0;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #555;
+}
+
+.invoice-detail-block p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.invoice-page-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 50px;
+}
+
+.invoice-page-table th {
+    text-align: left;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #555;
+    padding: 15px 0;
+    border-bottom: 2px solid #000;
+}
+
+.invoice-page-table td {
+    padding: 20px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.invoice-totals-section {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.invoice-totals-table {
+    width: 250px;
+}
+
+.invoice-total-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.invoice-grand-total {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #000;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.invoice-page-footer {
+    margin-top: 60px;
+    text-align: center;
+    font-size: 12px;
+    color: #555;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
+.invoice-btns {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    display: flex;
+    gap: 10px;
+}
+
+@media print {
+    body.invoice-body { padding: 0 !important; background: #fff !important; }
+    .invoice-page-container { border: none; width: 100%; max-width: none; margin: 0; padding: 0; }
+    .no-print { display: none !important; }
+}
+
+/* ── RESPONSIVE FINANCE ── */
+@media screen and (max-width: 1024px) {
+    .charts-row {
+        grid-template-columns: 1fr;
+    }
+    #invoiceModal .modal-content {
+        width: 95%;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .bill-to-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    .invoice-header {
+        flex-direction: column;
+        gap: 20px;
+    }
+    .invoice-meta {
+        text-align: left;
+    }
+    #invoicePrintArea {
+        padding: 20px;
+    }
+}

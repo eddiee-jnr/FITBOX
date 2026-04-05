@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supplier Directory - FitBox Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../backend.css">
+    <link rel="stylesheet" href="css/supply.css">
+</head>
+<body>
+
+<div class="main-content">
+    <header>
+        <div class="header-left">
+            <div class="title-group">
+                <div class="breadcrumb">Supply Chain / Suppliers</div>
+                <h1>Supplier Directory</h1>
+                <p class="header-subtitle">Manage your suppliers, product lines, and contract statuses</p>
+            </div>
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="Search suppliers..." onkeyup="filterSuppliers(this)">
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn-primary" id="addEntityBtn" onclick="openAddSupplierModal()"><i class="fa-solid fa-plus"></i> Add Supplier</button>
+        </div>
+    </header>
+
+    <!-- SUPPLIER TABLE -->
+    <div class="data-section">
+        <div class="section-header" style="flex-direction: column; align-items: flex-start; gap: 20px;">
+            <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 id="tableTitle">All Suppliers</h2>
+                    <p id="supplierCountLabel" class="section-subtitle">0 registered suppliers</p>
+                </div>
+                <div class="tab-switcher">
+                    <button class="tab-btn active" id="tab-supplier" onclick="switchSupplyTab('supplier')">Suppliers</button>
+                    <button class="tab-btn" id="tab-partner" onclick="switchSupplyTab('partner')">Partners</button>
+                </div>
+            </div>
+        </div>
+        <table id="suppliersTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th id="th-name">SUPPLIER NAME</th>
+                    <th>CONTACT</th>
+                    <th>EMAIL</th>
+                    <th id="th-type">PRODUCTS SUPPLIED</th>
+                    <th>STATUS</th>
+                    <th>ACTIONS</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamic Content -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- MODAL -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <h2 id="modalHeader">Update Supplier</h2>
+        <div id="modalBody"></div>
+        <div class="modal-footer">
+            <button onclick="closeModal()" class="action-btn">Cancel</button>
+            <button id="saveBtn" class="btn-primary">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<script src="../shared-admin.js"></script>
+<script>
+    let currentTab = 'supplier';
+    let allData = [];
+
+    document.addEventListener("DOMContentLoaded", () => {
+        loadSuppliers();
+    });
+
+    async function loadSuppliers() {
+        const res = await fetch(`${API_URL}/admin/suppliers`);
+        allData = await res.json();
+        renderTable();
+    }
+
+    function renderTable() {
+        const tbody = document.querySelector('#suppliersTable tbody');
+        const data = allData.filter(item => item.type === currentTab);
+        
+        document.getElementById('supplierCountLabel').textContent = `${data.length} ${currentTab === 'supplier' ? 'registered suppliers' : 'business partners'} found`;
+        document.getElementById('tableTitle').textContent = currentTab === 'supplier' ? 'All Suppliers' : 'Business Partners';
+        document.getElementById('th-name').textContent = currentTab === 'supplier' ? 'SUPPLIER NAME' : 'PARTNER NAME';
+        document.getElementById('th-type').textContent = currentTab === 'supplier' ? 'PRODUCTS SUPPLIED' : 'PARTNER TYPE';
+
+        tbody.innerHTML = data.map(s => `
+            <tr>
+                <td>#${s.id}</td>
+                <td><b>${s.company_name}</b></td>
+                <td>${s.contact_person}</td>
+                <td>${s.email || '-'}</td>
+                <td><span class="badge category-badge">${s.product_type}</span></td>
+                <td><span class="badge ${s.status}">${s.status}</span></td>
+                <td>
+                    <button class="action-btn" onclick='editSupplier(${JSON.stringify(s).replace(/'/g, "&apos;")})'>Edit</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function switchSupplyTab(tab) {
+        currentTab = tab;
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+            btn.style.background = 'transparent';
+            btn.style.color = '#666';
+            btn.style.boxShadow = 'none';
+        });
+        const activeBtn = document.getElementById(`tab-${tab}`);
+        activeBtn.classList.add('active');
+        
+        // Update the main header button text
+        document.getElementById('addEntityBtn').innerHTML = `<i class="fa-solid fa-plus"></i> ${tab === 'supplier' ? 'Add Supplier' : 'Add Partner'}`;
+        
+        renderTable();
+    }
+
+    function editSupplier(s) {
+        const content = `
+            <div class="form-group">
+                <label>Entity Type</label>
+                <select id="editSupType">
+                    <option value="supplier" ${s.type === 'supplier' ? 'selected' : ''}>Supplier</option>
+                    <option value="partner" ${s.type === 'partner' ? 'selected' : ''}>Partner</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select id="editSupStatus">
+                    <option value="active" ${s.status === 'active' ? 'selected' : ''}>Active</option>
+                    <option value="negotiating" ${s.status === 'negotiating' ? 'selected' : ''}>Negotiating</option>
+                    <option value="inactive" ${s.status === 'inactive' ? 'selected' : ''}>Inactive</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Contact Person</label>
+                <input type="text" id="editSupContact" value="${s.contact_person}">
+            </div>
+        `;
+        openModal(`Manage ${s.type === 'supplier' ? 'Supplier' : 'Partner'}: ${s.company_name}`, content, () => saveSupplier(s.id));
+    }
+
+    async function saveSupplier(id) {
+        const type = document.getElementById('editSupType').value;
+        const status = document.getElementById('editSupStatus').value;
+        const contact_person = document.getElementById('editSupContact').value;
+        await fetch(`${API_URL}/admin/suppliers/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type, status, contact_person })
+        });
+        closeModal();
+        loadSuppliers();
+    }
+
+    function openModal(header, content, saveFn) {
+        document.getElementById('modalHeader').textContent = header;
+        document.getElementById('modalBody').innerHTML = content;
+        document.getElementById('saveBtn').onclick = saveFn;
+        document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function openAddSupplierModal() {
+        document.getElementById('modalHeader').textContent = currentTab === 'supplier' ? 'Add New Supplier' : 'Add New Partner';
+        const modalBody = document.getElementById('modalBody');
+        modalBody.innerHTML = `
+            <div class="form-group">
+                <label>Company Name</label>
+                <input type="text" id="addName">
+            </div>
+            <div class="form-group">
+                <label>Contact Person</label>
+                <input type="text" id="addContact">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="addEmail">
+            </div>
+            <div class="form-group">
+                <label>${currentTab === 'supplier' ? 'Product Type' : 'Service Category'}</label>
+                <input type="text" id="addProd" placeholder="e.g. Cotton Hoodies">
+            </div>
+        `;
+        
+        document.getElementById('saveBtn').onclick = submitNewSupplier;
+        document.getElementById('editModal').style.display = 'flex';
+    }
+
+    async function submitNewSupplier() {
+        const name = document.getElementById('addName').value;
+        const contact = document.getElementById('addContact').value;
+        const email = document.getElementById('addEmail').value;
+        const prod = document.getElementById('addProd').value;
+
+        if(!name || !email) return alert("Name and Email are required");
+
+        const res = await fetch(`${API_URL}/admin/suppliers`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                company_name: name,
+                contact_person: contact,
+                email: email,
+                product_type: prod,
+                type: currentTab
+            })
+        });
+
+        if(res.ok) {
+            closeModal();
+            loadSuppliers();
+        } else { alert("Failed to add record"); }
+    }
+
+    function closeModal() { document.getElementById('editModal').style.display = 'none'; }
+
+    function filterSuppliers(input) {
+        const filter = input.value.toUpperCase();
+        const rows = document.getElementById("suppliersTable").getElementsByTagName("tr");
+        for (let i = 1; i < rows.length; i++) {
+            const text = rows[i].textContent.toUpperCase();
+            rows[i].style.display = text.indexOf(filter) > -1 ? "" : "none";
+        }
+    }
+</script>
+
+</body>
+</html>

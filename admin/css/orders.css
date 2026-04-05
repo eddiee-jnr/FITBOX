@@ -1,0 +1,119 @@
+/* Orders Module Styles */
+
+/* ── INVENTORY SPECIFIC ── */
+.stock-info {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.stock-bar-container {
+    width: 60px;
+    height: 4px;
+    background: #edf2f7;
+    border-radius: 10px;
+    margin-top: 5px;
+    overflow: hidden;
+}
+
+.stock-bar {
+    height: 100%;
+    background: #000;
+}
+
+.stock-bar.low {
+    background: #f56565;
+}
+
+/* ── STATUS PILLS ── */
+.status-pill {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.status-pill.in { background: #e8f5e9; color: #2e7d32; }
+.status-pill.low { background: #fff8e1; color: #b7791f; }
+.status-pill.out { background: #ffebee; color: #c62828; }
+
+/* ── MODAL OVERRIDES ── */
+#editModal .modal-content {
+    width: 450px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 11px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    color: #777;
+    font-weight: 600;
+}
+
+.form-group input, 
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+/* ── PRODUCT CATALOG SPECIFIC ── */
+.product-id { font-family: monospace; color: var(--admin-text-muted); font-size: 11px; }
+.product-name { font-weight: 600; color: var(--admin-text-primary); }
+.category-badge { 
+    background: #f8f9fa; 
+    padding: 4px 10px; 
+    border-radius: 4px; 
+    font-size: 10px; 
+    letter-spacing: 1px;
+    color: #666;
+    border: 1px solid #eee;
+}
+
+.action-icon {
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: #f8f9fa;
+    border: 1px solid #eee;
+    transition: 0.2s;
+    margin-right: 5px;
+}
+.action-icon:hover { background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transform: translateY(-2px); }
+.action-icon.edit { color: #555; }
+.action-icon.delete { color: #f56565; }
+
+/* ── RESPONSIVE ORDERS ── */
+@media screen and (max-width: 1024px) {
+    .pipeline-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .pipeline-grid {
+        grid-template-columns: 1fr;
+    }
+    .main-content {
+        padding: 20px;
+    }
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enquiries - FitBox CRM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../backend.css">
+    <link rel="stylesheet" href="css/crm.css">
+</head>
+<body>
+
+<div class="main-content">
+    <header>
+        <div class="header-left">
+            <div class="title-group">
+                <div class="breadcrumb">CRM / Enquiries</div>
+                <h1>Customer Enquiries</h1>
+                <p class="header-subtitle">Review and respond to customer questions and messages</p>
+            </div>
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="Search by name or subject..." onkeyup="filterEnquiries(this)">
+            </div>
+        </div>
+    </header>
+
+    <div class="data-section">
+        <div class="section-header">
+            <h2>Recent Messages</h2>
+            <p id="enquiryCountLabel" class="section-subtitle">0 enquiries received</p>
+        </div>
+        <table id="enquiriesTable">
+            <thead>
+                <tr>
+                    <th>DATE</th>
+                    <th>CUSTOMER</th>
+                    <th>SUBJECT</th>
+                    <th>MESSAGE</th>
+                    <th>STATUS</th>
+                    <th>ACTIONS</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamic Content -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="../shared-admin.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        loadEnquiries();
+    });
+
+    async function loadEnquiries() {
+        const res = await fetch(`${API_URL}/admin/feedback`); // Backend uses 'feedback' table
+        const data = await res.json();
+        const tbody = document.querySelector('#enquiriesTable tbody');
+        document.getElementById('enquiryCountLabel').textContent = `${data.length} enquiries received`;
+        
+        tbody.innerHTML = data.map(m => `
+            <tr>
+                <td style="font-size:12px; color:#777;">${new Date(m.created_at).toLocaleDateString()}</td>
+                <td>
+                    <div style="font-weight:600;">${m.name}</div>
+                    <div style="font-size:11px; opacity:0.6;">${m.email}</div>
+                </td>
+                <td class="enquiry-subject">"${m.subject}"</td>
+                <td class="enquiry-message-preview">${m.message}</td>
+                <td><span class="badge" style="background:#e1f5fe; color:#0288d1;">${m.status.toUpperCase()}</span></td>
+                <td>
+                    <button class="action-btn" onclick="alert('Replying to ${m.email}')"><i class="fa-solid fa-reply"></i> Reply</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function filterEnquiries(input) {
+        const filter = input.value.toUpperCase();
+        const rows = document.getElementById("enquiriesTable").getElementsByTagName("tr");
+        for (let i = 1; i < rows.length; i++) {
+            const text = rows[i].textContent.toUpperCase();
+            rows[i].style.display = text.indexOf(filter) > -1 ? "" : "none";
+        }
+    }
+</script>
+
+</body>
+</html>

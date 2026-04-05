@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard - FitBox</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+
+<style>
+body{
+  background:#f8f8f8;
+}
+
+/* PAGE HEADER */
+.page-header {
+  margin-top: 100px;
+  padding: 40px 10%;
+  background: #0D0D0D;
+  color: white;
+}
+
+.page-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 36px;
+}
+
+.page-header p {
+  color: #aaa;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+/* DASHBOARD LAYOUT */
+.dashboard-container {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 40px;
+  padding: 40px 10%;
+  min-height: 50vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  height: fit-content;
+}
+
+.sidebar button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 12px 0;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  color: #777;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+  transition: 0.3s;
+}
+
+.sidebar button:hover, .sidebar button.active {
+  color: black;
+  font-weight: 500;
+  padding-left: 5px;
+}
+
+.sidebar .logout {
+  color: red;
+  border-bottom: none;
+  margin-top: 20px;
+}
+
+/* CONTENT AREA */
+.content-area {
+  background: white;
+  padding: 40px;
+  border-radius: 8px;
+}
+
+.tab-pane {
+  display: none;
+  animation: fadeIn 0.4s ease;
+}
+
+.tab-pane.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.tab-pane h2 {
+  font-family: 'Playfair Display', serif;
+  margin-bottom: 30px;
+  font-size: 24px;
+}
+
+/* PROFILE FORM */
+.form-group {
+  margin-bottom: 20px;
+}
+.form-group label {
+  display: block;
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 8px;
+}
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  outline: none;
+  font-family: inherit;
+  background:#fdfdfd;
+}
+
+.btn-save {
+  padding: 12px 24px;
+  background: black;
+  color: white;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 1px;
+  margin-top: 10px;
+}
+
+/* ORDERS LIST */
+.order-card {
+  border: 1px solid #eee;
+  padding: 20px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px dashed #eee;
+}
+
+.order-header h4 {
+  font-size: 15px;
+}
+
+.order-status {
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.order-status.pending { background: #FFF8E1; color: #B7791F; }
+.order-status.processing { background: #FFF3E0; color: #E65100; }
+.order-status.shipped { background: #F3E5F5; color: #7B1FA2; }
+.order-status.delivered { background: #E8F5E9; color: #2E7D32; }
+.order-status.cancelled, .order-status.failed { background: #FFEBEE; color: #C62828; }
+
+.order-details {
+  font-size: 13px;
+  color: #555;
+}
+
+.empty-state {
+  text-align: center;
+  color: #777;
+  padding: 40px 0;
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+  <div class="nav-links nav-left">
+    <a href="index.html">HOME</a>
+    <a href="collection.html">COLLECTION</a>
+    <a href="about.html">ABOUT US</a>
+    <a href="contact.html">CONTACT</a>
+  </div>
+  <a href="index.html" class="logo">FITBOX</a>
+  <div class="nav-links right">
+    <a href="profile.html" class="active">PROFILE</a>
+  </div>
+</nav>
+
+<div id="toast" class="toast">Profile updated successfully!</div>
+
+<div class="page-header">
+  <h1 id="welcomeText">My Dashboard</h1>
+  <p>Manage your account, track orders, and update details.</p>
+</div>
+
+<div class="dashboard-container">
+  
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <button class="active" onclick="switchTab(this, 'profileTab')">My Profile</button>
+    <button onclick="switchTab(this, 'ordersTab')">Order History</button>
+    <button class="logout" onclick="logout()">LOG OUT</button>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content-area">
+    
+    <!-- Profile Tab -->
+    <div id="profileTab" class="tab-pane active">
+      <h2>Profile Information</h2>
+      
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="profName" placeholder="Enter name">
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="profEmail" placeholder="Enter email" readonly>
+      </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="text" id="profPhone" placeholder="+233 ...">
+      </div>
+      <div class="form-group">
+        <label>Address</label>
+        <input type="text" id="profAddress" placeholder="Enter address">
+      </div>
+      
+      <button class="btn-save" onclick="updateProfile()">SAVE CHANGES</button>
+    </div>
+
+    <!-- Orders Tab -->
+    <div id="ordersTab" class="tab-pane">
+      <h2>Order History</h2>
+      <div id="ordersList">
+        <!-- Dynamic orders will be injected here -->
+        <div class="empty-state">Loading your orders...</div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+
+  <div class="footer-container">
+
+    <!-- CONTACT -->
+    <div class="footer-col">
+      <h4>CONTACT</h4>
+      <p>Premium streetwear brand built for style and confidence.</p>
+
+      <div class="socials">
+        <a href="#"><svg viewBox="0 0 24 24"><path d="M7 2C4.2 2 2 4.2 2 7v10c0 2.8 2.2 5 5 5h10c2.8 0 5-2.2 5-5V7c0-2.8-2.2-5-5-5H7zm5 5a5 5 0 110 10 5 5 0 010-10zm6.5-.8a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"/></svg></a>
+        <a href="#"><svg viewBox="0 0 24 24"><path d="M22 5.9c-.8.4-1.6.6-2.4.7.9-.5 1.5-1.3 1.8-2.2-.8.5-1.7.8-2.6 1-1.6-1.7-4.3-1.6-5.8.2-1 1.2-1.3 2.8-.8 4.3-3.5-.2-6.6-1.8-8.7-4.5-1.1 1.9-.5 4.3 1.3 5.5-.7 0-1.3-.2-1.9-.5 0 2 1.4 3.8 3.4 4.2-.6.2-1.2.2-1.8.1.5 1.7 2.1 2.9 3.9 2.9-1.5 1.2-3.4 1.8-5.3 1.8H2c2 1.3 4.3 2 6.7 2 8 0 12.4-6.7 12.4-12.4v-.6c.8-.6 1.5-1.3 2-2.1z"/></svg></a>
+        <a href="#"><svg viewBox="0 0 24 24"><path d="M22 12a10 10 0 10-11.5 9.9v-7H8v-3h2.5V9.5c0-2.5 1.5-3.9 3.7-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.7-1.6 1.5V12H17l-.5 3h-2.8v7A10 10 0 0022 12z"/></svg></a>
+      </div>
+    </div>
+
+    <!-- INFORMATION -->
+    <div class="footer-col">
+      <h4>INFORMATION</h4>
+      <ul>
+        <li>New Collection</li>
+        <li>Exclusive Product</li>
+        <li>Custom Wears</li>
+        <li>Our Story</li>
+      </ul>
+    </div>
+
+    <!-- NEWSLETTER -->
+    <div class="footer-col">
+      <h4>NEWSLETTER</h4>
+      <p>Subscribe to get updates on offers, discounts and new arrivals.</p>
+      <div class="newsletter">
+        <input type="email" id="newsletterEmail" placeholder="Enter your email">
+        <button onclick="subscribe()">→</button>
+      </div>
+      <p id="newsletterMsg" style="margin-top:10px; font-size:12px;"></p>
+    </div>
+
+    <!-- ADDRESS -->
+    <div class="footer-col">
+      <h4>ADDRESS</h4>
+      <p>4th Dr Akwei Onufugbortsui St</p>
+      <p>Ghana</p>
+      <p>fitboxclothing@gmail.com</p>
+      <p>+233 552 484 014</p>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    © 2026 FITBOX. All rights reserved.
+  </div>
+
+</footer>
+
+<script>
+const API_URL = "http://localhost:3000/api";
+
+// Check Authentication status
+const user = JSON.parse(localStorage.getItem("customer_user"));
+if(!user || localStorage.getItem("customer_loggedIn") !== "true") {
+  window.location.href = "auth.html";
+}
+
+// Initial Load
+document.addEventListener("DOMContentLoaded", () => {
+  if (user) {
+    document.getElementById("welcomeText").textContent = "Welcome, " + user.name;
+    loadProfile();
+    loadOrderHistory();
+  }
+});
+
+async function loadProfile() {
+  try {
+    const res = await fetch(`${API_URL}/customers/${user.id}`);
+    const data = await res.json();
+    if (res.ok) {
+      document.getElementById("profName").value = data.name;
+      document.getElementById("profEmail").value = data.email;
+      document.getElementById("profPhone").value = data.phone || "";
+      document.getElementById("profAddress").value = data.address || "";
+    }
+  } catch (err) {
+    console.error("Profile load failed");
+  }
+}
+
+async function loadOrderHistory() {
+  const list = document.getElementById("ordersList");
+  try {
+    const res = await fetch(`${API_URL}/orders/customer/${user.id}`);
+    const orders = await res.json();
+
+    if (orders.length === 0) {
+      list.innerHTML = '<div class="empty-state">You haven\'t placed any orders yet.</div>';
+      return;
+    }
+
+    list.innerHTML = "";
+    orders.forEach(order => {
+      list.innerHTML += `
+        <div class="order-card">
+          <div class="order-header">
+            <h4>Order #FB-${order.id}</h4>
+            <span class="order-status ${order.status}">${order.status.toUpperCase()}</span>
+          </div>
+          <div class="order-details">
+            <p><strong>Date:</strong> ${new Date(order.created_at).toLocaleDateString()}</p>
+            <p><strong>Total:</strong> GH₵ ${order.total_amount}</p>
+            <p><strong>Items:</strong> ${order.items_summary || "Details not found"}</p>
+          </div>
+        </div>
+      `;
+    });
+  } catch (err) {
+    list.innerHTML = '<div class="empty-state">Failed to load order history.</div>';
+  }
+}
+
+function switchTab(btn, tabId) {
+  document.querySelectorAll(".sidebar button").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
+  document.getElementById(tabId).classList.add("active");
+}
+
+async function updateProfile() {
+  const name = document.getElementById("profName").value;
+  const phone = document.getElementById("profPhone").value;
+  const address = document.getElementById("profAddress").value;
+
+  try {
+    const res = await fetch(`${API_URL}/customers/${user.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, phone, address })
+    });
+
+    if (res.ok) {
+      user.name = name; // Update local session
+      localStorage.setItem("customer_user", JSON.stringify(user));
+      document.getElementById("welcomeText").textContent = "Welcome, " + user.name;
+      
+      const toast = document.getElementById("toast");
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 3000);
+    }
+  } catch (err) {
+    alert("Server error updating profile");
+  }
+}
+
+function logout() {
+  localStorage.removeItem("customer_user");
+  localStorage.removeItem("customer_loggedIn");
+  window.location.href = "index.html";
+}
+</script>
+
+</body>
+</html>

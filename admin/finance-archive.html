@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt Archive - FitBox Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../backend.css">
+    <link rel="stylesheet" href="css/finance.css">
+</head>
+<body>
+
+<div class="main-content">
+    <header>
+        <div class="header-left">
+            <div class="title-group">
+                <div class="breadcrumb">Finance / Receipt Archive</div>
+                <h1>Order Invoices</h1>
+                <p class="header-subtitle">Generate and reprints official receipts for all customer transactions</p>
+            </div>
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="Search Order ID or Customer Name..." onkeyup="filterInvoices(this)">
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn-primary" onclick="loadInvoices()"><i class="fa-solid fa-rotate"></i> Sync Data</button>
+        </div>
+    </header>
+
+    <!-- INVOICE LIST -->
+    <div class="data-section">
+        <div class="section-header">
+            <h2>Transition History</h2>
+            <p id="invoiceCountLabel" class="section-subtitle">0 records found</p>
+        </div>
+        <table id="invoiceTable">
+            <thead>
+                <tr>
+                    <th>ORDER ID</th>
+                    <th>CUSTOMER</th>
+                    <th>DATE</th>
+                    <th>TOTAL AMOUNT</th>
+                    <th>PAYMENT</th>
+                    <th style="text-align: right;">ACTION</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamic Content -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="../shared-admin.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        loadInvoices();
+    });
+
+    async function loadInvoices() {
+        const res = await fetch(`${API_URL}/admin/orders`);
+        const data = await res.json();
+        const tbody = document.querySelector('#invoiceTable tbody');
+        document.getElementById('invoiceCountLabel').textContent = `${data.length} invoices available`;
+        
+        tbody.innerHTML = data.map(o => `
+            <tr>
+                <td><b>#FB-${o.id}</b></td>
+                <td>${o.customer_name || 'Guest User'}</td>
+                <td>${new Date(o.created_at).toLocaleDateString()}</td>
+                <td><b>GH₵ ${parseFloat(o.total_amount).toFixed(2)}</b></td>
+                <td><small>${o.payment_method.toUpperCase()}</small></td>
+                <td style="text-align: right;">
+                    <button class="action-btn" onclick="openInvoice(${o.id})">
+                        <i class="fa-solid fa-file-invoice"></i> Reprints Invoice
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function openInvoice(id) {
+        window.open(`finance-invoice.html?id=${id}`, '_blank');
+    }
+
+    function filterInvoices(input) {
+        const filter = input.value.toUpperCase();
+        const rows = document.getElementById("invoiceTable").getElementsByTagName("tr");
+        for (let i = 1; i < rows.length; i++) {
+            const text = rows[i].textContent.toUpperCase();
+            rows[i].style.display = text.indexOf(filter) > -1 ? "" : "none";
+        }
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distribution Pipeline - FitBox Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../backend.css">
+    <link rel="stylesheet" href="css/supply.css">
+</head>
+<body>
+
+<div class="main-content">
+    <header>
+        <div class="left">
+            <div class="breadcrumb">Supply Chain / Distribution Pipeline</div>
+            <h1>Distribution Pipeline</h1>
+            <p class="header-subtitle">Visual tracking of orders moving through the fulfilment stages</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn-primary" onclick="window.location.href='orders-manager.html'"><i class="fa-solid fa-pen-to-square"></i> Update Statuses</button>
+        </div>
+    </header>
+
+    <!-- PIPELINE FLOW CARDS -->
+    <div class="pipeline-grid">
+        <div class="pipeline-card pending">
+            <h4><i class="fa-solid fa-hourglass-half"></i> PENDING</h4>
+            <div class="count" id="count-pending">0</div>
+            <i class="fa-solid fa-chevron-right"></i>
+        </div>
+        <div class="pipeline-card processing">
+            <h4><i class="fa-solid fa-gears"></i> PROCESSING</h4>
+            <div class="count" id="count-processing">0</div>
+            <i class="fa-solid fa-chevron-right"></i>
+        </div>
+        <div class="pipeline-card shipped">
+            <h4><i class="fa-solid fa-truck-fast"></i> SHIPPED</h4>
+            <div class="count" id="count-shipped">0</div>
+            <i class="fa-solid fa-chevron-right"></i>
+        </div>
+        <div class="pipeline-card delivered">
+            <h4><i class="fa-solid fa-circle-check"></i> DELIVERED</h4>
+            <div class="count" id="count-delivered">0</div>
+        </div>
+    </div>
+
+    <!-- PIPELINE SUMMARY TABLE -->
+    <div class="data-section">
+        <div class="section-header">
+            <h2>Pipeline Summary</h2>
+            <p class="section-subtitle">Order counts and values per stage</p>
+        </div>
+        <table id="pipelineTable">
+            <thead>
+                <tr>
+                    <th>STAGE</th>
+                    <th>ORDERS</th>
+                    <th>TOTAL VALUE</th>
+                    <th>ACTION</th>
+                </tr>
+            </thead>
+            <tbody id="pipelineBody">
+                <!-- Dynamic Content -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="../shared-admin.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        loadDistribution();
+    });
+
+    async function loadDistribution() {
+        const res = await fetch(`${API_URL}/admin/distribution/summary`);
+        const data = await res.json();
+        
+        // Define statuses in order
+        const stages = ['pending', 'processing', 'shipped', 'delivered'];
+        const tbody = document.getElementById('pipelineBody');
+        tbody.innerHTML = '';
+
+        stages.forEach(stage => {
+            const found = data.find(item => item.status.toLowerCase() === stage);
+            const count = found ? found.count : 0;
+            const value = found ? parseFloat(found.value).toFixed(2) : "0.00";
+            
+            // Update Top Cards
+            const cardEl = document.getElementById(`count-${stage}`);
+            if(cardEl) cardEl.textContent = count;
+
+            // Add to Table
+            tbody.innerHTML += `
+                <tr>
+                    <td><span class="badge ${stage}" style="background:var(--status-${stage}-bg); color:var(--status-${stage}-text);">${stage}</span></td>
+                    <td style="font-weight:600;">${count}</td>
+                    <td>GH₵ ${value}</td>
+                    <td><button class="action-btn" onclick="window.location.href='orders-manager.html'"><i class="fa-solid fa-arrow-right"></i></button></td>
+                </tr>
+            `;
+        });
+    }
+</script>
+
+</body>
+</html>

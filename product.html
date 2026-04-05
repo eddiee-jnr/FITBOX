@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Collection - FitBox</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="shared.css">
+
+<style>
+body {
+  background: #fafafa;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+section {
+  scroll-margin-top: 120px;
+}
+
+/* HEADER */
+.header {
+  margin-top: 120px;
+  text-align: center;
+  padding: 40px;
+}
+
+.header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 42px;
+}
+
+.header p {
+  color: #777;
+  margin-top: 10px;
+}
+
+/* COLLECTION NAV */
+.collection-nav {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-bottom: 20px;
+}
+
+.collection-nav a {
+  text-decoration: none;
+  color: #777;
+  font-size: 13px;
+  letter-spacing: 2px;
+  transition: 0.3s;
+}
+
+.collection-nav a:hover {
+  color: black;
+}
+
+/* FILTERS */
+.filters {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.filters button {
+  margin: 5px;
+  padding: 8px 18px;
+  border: 1px solid #ccc;
+  background: transparent;
+  cursor: pointer;
+}
+
+.filters button:hover {
+  background: black;
+  color: white;
+}
+
+/* COLLECTION */
+.collection-section {
+  padding: 60px;
+}
+
+.collection-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  margin-bottom: 30px;
+}
+
+/* GRID */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 25px;
+}
+
+/* PRODUCT */
+.product {
+  background: white;
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+}
+
+.product img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  transition: 0.4s;
+}
+
+.product:hover img {
+  transform: scale(1.08);
+}
+
+/* OVERLAY */
+.product::after {
+  content: "VIEW";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: 0.4s;
+}
+
+.product:hover::after {
+  opacity: 1;
+}
+
+.product h4 {
+  padding: 10px;
+}
+
+.product p {
+  padding: 0 10px 10px;
+  color: #777;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-box {
+  background: white;
+  width: 800px;
+  max-width: 95%;
+  padding: 30px;
+  animation: pop 0.4s ease;
+  position: relative;
+}
+
+@keyframes pop {
+  from {opacity: 0; transform: scale(0.9);}
+  to {opacity: 1; transform: scale(1);}
+}
+
+.close-btn {
+  position: absolute;
+  right: 20px;
+  top: 10px;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+/* IMAGES */
+.modal-images img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+}
+
+.thumbs {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.thumbs img {
+  width: 60px;
+  height: 60px;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.thumbs img:hover {
+  opacity: 1;
+}
+
+/* INFO */
+.modal-info h2 {
+  font-family: 'Playfair Display', serif;
+}
+
+.modal-info p {
+  color: #777;
+  margin: 10px 0;
+}
+
+/* SIZE */
+.size-options {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.size-options span {
+  border: 1px solid #ccc;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.size-options span.active {
+  background: black;
+  color: white;
+}
+
+/* QUANTITY */
+.quantity {
+  margin: 20px 0;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.quantity button {
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+/* BUTTON */
+.add-cart {
+  width: 100%;
+  padding: 12px;
+  background: black;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-left">
+    <a href="index.html">HOME</a>
+    <a href="collection.html">COLLECTION</a>
+    <a href="about.html">ABOUT US</a>
+  </div>
+
+  <div class="logo">FITBOX</div>
+
+  <div class="nav-right">
+    <div class="cart-wrapper" onclick="window.location.href='cart.html'">
+      <!-- CART ICON -->
+      <i class="fa-solid fa-cart-shopping icon"></i>
+      <!-- BADGE -->
+      <span id="cartCount" class="cart-count">0</span>
+    </div>
+
+    <!-- ACCOUNT ICON -->
+    <a href="auth.html" onclick="handleAccountClick(event)">
+      <i class="fa-solid fa-user icon"></i>
+    </a>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<section class="header">
+  <h1>COLLECTIONS</h1>
+  <p>Explore all FitBox drops</p>
+</section>
+
+<!-- NAV TABS -->
+<div class="collection-nav">
+  <a href="#maestro">MAESTRO</a>
+  <a href="#legacy">LEGACY</a>
+  <a href="#custom">CUSTOM</a>
+</div>
+
+<!-- FILTERS -->
+<div class="filters">
+  <button onclick="filterProducts('all')">ALL</button>
+  <button onclick="filterProducts('hoodie')">HOODIES</button>
+  <button onclick="filterProducts('tee')">TEES</button>
+</div>
+
+<div id="quickView" class="modal">
+  <div class="modal-box">
+
+    <span class="close-btn">&times;</span>
+
+    <div class="modal-grid">
+
+      <!-- LEFT (IMAGES) -->
+      <div class="modal-images">
+        <img id="mainImg" src="">
+
+        <div class="thumbs">
+          <img onclick="changeImg(this)" src="images/product1.jpg">
+          <img onclick="changeImg(this)" src="images/product2.jpg">
+          <img onclick="changeImg(this)" src="images/product3.jpg">
+        </div>
+      </div>
+
+      <!-- RIGHT (DETAILS) -->
+      <div class="modal-info">
+        <h2 id="modalTitle"></h2>
+        <p id="modalPrice"></p>
+
+        <!-- SIZE -->
+        <div class="sizes">
+          <p>Select Size</p>
+          <div class="size-options">
+            <span onclick="selectSize(this)">S</span>
+            <span onclick="selectSize(this)">M</span>
+            <span onclick="selectSize(this)">L</span>
+            <span onclick="selectSize(this)">XL</span>
+          </div>
+        </div>
+
+        <!-- QUANTITY -->
+        <div class="quantity">
+          <button onclick="changeQty(-1)">-</button>
+          <span id="qty">1</span>
+          <button onclick="changeQty(1)">+</button>
+        </div>
+
+        <button class="add-cart" onclick="addToCart()">ADD TO CART</button>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- MAESTRO -->
+<section id="maestro" class="collection-section">
+  <h2 class="collection-title">THE MAESTRO</h2>
+  <div class="grid" id="maestroGrid"></div>
+</section>
+
+<!-- LEGACY -->
+<section id="legacy" class="collection-section">
+  <h2 class="collection-title">THE LEGACY CAPSULE</h2>
+  <div class="grid" id="legacyGrid"></div>
+</section>
+
+<!-- CUSTOM -->
+<section id="custom" class="collection-section">
+  <h2 class="collection-title">CUSTOM WEARS</h2>
+  <div class="grid" id="customGrid"></div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+
+  <div class="footer-container">
+
+    <!-- CONTACT -->
+    <div class="footer-col">
+      <h4>CONTACT</h4>
+      <p>Premium streetwear brand built for style and confidence.</p>
+
+      <div class="socials">
+        <a href="#"><svg viewBox="0 0 24 24"><path d="M7 2C4.2 2 2 4.2 2 7v10c0 2.8 2.2 5 5 5h10c2.8 0 5-2.2 5-5V7c0-2.8-2.2-5-5-5H7zm5 5a5 5 0 110 10 5 5 0 010-10zm6.5-.8a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"/></svg></a>
+        <a href="#"><svg viewBox="0 0 24 24"><path d="M22 5.9c-.8.4-1.6.6-2.4.7.9-.5 1.5-1.3 1.8-2.2-.8.5-1.7.8-2.6 1-1.6-1.7-4.3-1.6-5.8.2-1 1.2-1.3 2.8-.8 4.3-3.5-.2-6.6-1.8-8.7-4.5-1.1 1.9-.5 4.3 1.3 5.5-.7 0-1.3-.2-1.9-.5 0 2 1.4 3.8 3.4 4.2-.6.2-1.2.2-1.8.1.5 1.7 2.1 2.9 3.9 2.9-1.5 1.2-3.4 1.8-5.3 1.8H2c2 1.3 4.3 2 6.7 2 8 0 12.4-6.7 12.4-12.4v-.6c.8-.6 1.5-1.3 2-2.1z"/></svg></a>
+        <a href="#"><svg viewBox="0 0 24 24"><path d="M22 12a10 10 0 10-11.5 9.9v-7H8v-3h2.5V9.5c0-2.5 1.5-3.9 3.7-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.7-1.6 1.5V12H17l-.5 3h-2.8v7A10 10 0 0022 12z"/></svg></a>
+      </div>
+    </div>
+
+    <!-- INFORMATION -->
+    <div class="footer-col">
+      <h4>INFORMATION</h4>
+      <ul>
+        <li>New Collection</li>
+        <li>Exclusive Product</li>
+        <li>Custom Wears</li>
+        <li>Our Story</li>
+      </ul>
+    </div>
+
+    <!-- NEWSLETTER -->
+    <div class="footer-col">
+      <h4>NEWSLETTER</h4>
+      <p>Subscribe to get updates on offers, discounts and new arrivals.</p>
+      <div class="newsletter">
+        <input type="email" id="newsletterEmail" placeholder="Enter your email">
+        <button onclick="subscribe()">→</button>
+      </div>
+      <p id="newsletterMsg" style="margin-top:10px; font-size:12px;"></p>
+    </div>
+
+    <!-- ADDRESS -->
+    <div class="footer-col">
+      <h4>ADDRESS</h4>
+      <p>4th Dr Akwei Onufugbortsui St</p>
+      <p>Ghana</p>
+      <p>fitboxclothing@gmail.com</p>
+      <p>+233 552 484 014</p>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    © 2026 FITBOX. All rights reserved.
+  </div>
+
+</footer>
+
+<div id="toast" class="toast">Added to cart</div>
+
+<script>
+// PRODUCT DATA
+const products = [
+  {name:"Jersey", price:60, img:"images/66jersey.jpg", category:"hoodie"},
+  {name:"White Tee", price:40, img:"images/product2.jpg", category:"tee"},
+  {name:"Street Hoodie", price:65, img:"images/product3.jpg", category:"hoodie"},
+  {name:"Oversized Tee", price:45, img:"images/product4.jpg", category:"tee"},
+];
+
+let selectedSize = "";
+let quantity = 1;
+
+function openModal(product){
+  document.getElementById("quickView").style.display = "flex";
+
+  document.getElementById("mainImg").src = product.dataset.img;
+  document.getElementById("modalTitle").textContent = product.dataset.name;
+  document.getElementById("modalPrice").textContent = product.dataset.price;
+
+  quantity = 1;
+  document.getElementById("qty").textContent = quantity;
+  selectedSize = "";
+}
+
+// CHANGE IMAGE
+function changeImg(img){
+  document.getElementById("mainImg").src = img.src;
+}
+
+// SELECT SIZE
+function selectSize(el){
+  document.querySelectorAll(".size-options span").forEach(s => s.classList.remove("active"));
+  el.classList.add("active");
+  selectedSize = el.textContent;
+}
+
+// QUANTITY
+function changeQty(val){
+  quantity += val;
+  if(quantity < 1) quantity = 1;
+  document.getElementById("qty").textContent = quantity;
+}
+
+// ADD TO CART
+function addToCart(){
+  if(!selectedSize){
+    alert("Select a size");
+    return;
+  }
+
+  const item = {
+    name: document.getElementById("modalTitle").textContent,
+    price: document.getElementById("modalPrice").textContent,
+    img: document.getElementById("mainImg").src,
+    size: selectedSize,
+    qty: quantity
+  };
+
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  cart.push(item);
+  localStorage.setItem("cart", JSON.stringify(cart));
+
+  const toast = document.getElementById("toast");
+  toast.textContent = `Added to cart: ${item.name}`;
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 3000);
+  updateCartBadge();
+}
+
+// CLOSE
+document.querySelector(".close-btn").onclick = () => {
+  document.getElementById("quickView").style.display = "none";
+};
+
+window.onclick = (e) => {
+  if(e.target.id === "quickView"){
+    document.getElementById("quickView").style.display = "none";
+  }
+};
+
+// LOAD PRODUCTS
+function loadProducts(sectionId){
+  const grid = document.getElementById(sectionId);
+  for(let i=0;i<10;i++){
+    let p = products[i % products.length];
+    grid.innerHTML += `
+      <div class="product" data-category="${p.category}">
+        <img src="${p.img}">
+        <h4>${p.name}</h4>
+        <p>GH₵ ${p.price}</p>
+      </div>
+    `;
+  }
+}
+
+loadProducts("maestroGrid");
+loadProducts("legacyGrid");
+loadProducts("customGrid");
+
+// FILTER
+function filterProducts(category){
+  const items = document.querySelectorAll(".product");
+  items.forEach(item=>{
+    if(category==="all" || item.dataset.category===category){
+      item.style.display="block";
+    } else {
+      item.style.display="none";
+    }
+  });
+}
+
+// ACCOUNT CHECK
+function handleAccountClick(e){
+ e.preventDefault();
+  const isLoggedIn = localStorage.getItem("loggedIn");
+  if(isLoggedIn==="true"){
+    window.location.href="profile.html";
+  } else {
+    window.location.href="auth.html";
+  }
+}
+
+function updateCartBadge() {
+  const c = JSON.parse(localStorage.getItem('cart')) || [];
+  const total = c.reduce((sum, item) => sum + item.qty, 0);
+  const badge = document.getElementById('cartCount');
+  if (badge) {
+    if (total > 0) {
+      badge.style.display = 'block';
+      badge.textContent = total;
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+}
+
+window.addEventListener('load', updateCartBadge);
+
+const links = document.querySelectorAll(".nav-left a");
+links.forEach(link => {
+  if (window.location.href.includes(link.getAttribute("href"))) {
+    link.classList.add("active");
+  }
+});
+</script>
+
+</body>
+</html>

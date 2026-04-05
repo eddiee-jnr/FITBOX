@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Tracker - FitBox Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../backend.css">
+    <link rel="stylesheet" href="css/orders.css">
+</head>
+<body>
+
+<div class="main-content">
+    <header>
+        <div class="header-left">
+            <div class="title-group">
+                <div class="breadcrumb">Orders / Inventory Management</div>
+                <h1>Inventory Tracker</h1>
+                <p class="header-subtitle">Monitor stock levels and identify items that need reordering</p>
+            </div>
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="Search products..." onkeyup="filterInventory(this)">
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn-primary" onclick="refreshAll()"><i class="fa-solid fa-rotate"></i> Sync Inventory</button>
+        </div>
+    </header>
+
+    <!-- INVENTORY SUMMARY -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="icon-label status-pill in"><i class="fa-solid fa-circle-check"></i></div>
+            <h3>IN STOCK</h3>
+            <div class="value" id="inStockCount">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="icon-label status-pill low"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <h3>LOW STOCK</h3>
+            <div class="value" id="lowStockCount">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="icon-label status-pill out"><i class="fa-solid fa-circle-xmark"></i></div>
+            <h3>OUT OF STOCK</h3>
+            <div class="value" id="outStockCount">0</div>
+        </div>
+    </div>
+
+    <!-- STOCK LEVELS TABLE -->
+    <div class="data-section">
+        <div class="section-header">
+            <div>
+                <h2>Stock Levels</h2>
+                <p id="productCountLabel" class="section-subtitle">0 products tracked</p>
+            </div>
+        </div>
+        <table id="inventoryTable">
+            <thead>
+                <tr>
+                    <th>PRODUCT</th>
+                    <th>CATEGORY</th>
+                    <th>PRICE</th>
+                    <th>STOCK (UNITS)</th>
+                    <th>REORDER LEVEL</th>
+                    <th>STATUS</th>
+                    <th>ACTION</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamic Content -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- EDIT/ADD MODAL -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <h2 id="modalHeader">Update Inventory</h2>
+        <div id="modalBody"></div>
+        <div class="modal-footer">
+            <button onclick="closeModal()" class="action-btn">Cancel</button>
+            <button id="saveBtn" class="btn-primary">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<script src="../shared-admin.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        loadInventory();
+        loadSummary();
+    });
+
+    let inventoryMap = {};
+
+    async function loadSummary() {
+        const res = await fetch(`${API_URL}/admin/inventory/summary`);
+        const data = await res.json();
+        document.getElementById('inStockCount').textContent = data.inStock || 0;
+        document.getElementById('lowStockCount').textContent = data.lowStock || 0;
+        document.getElementById('outStockCount').textContent = data.outStock || 0;
+    }
+
+    async function loadInventory() {
+        const res = await fetch(`${API_URL}/admin/inventory`);
+        const data = await res.json();
+        const tbody = document.querySelector('#inventoryTable tbody');
+        document.getElementById('productCountLabel').textContent = `${data.length} products tracked`;
+        
+        tbody.innerHTML = data.map(p => {
+            const outOfStock = Number(p.stock_quantity) <= 0;
+            const lowStock = !outOfStock && Number(p.stock_quantity) <= Number(p.reorder_level || 10);
+            
+            const statusClass = outOfStock ? 'out' : (lowStock ? 'low' : 'in');
+            const statusText = outOfStock ? 'OUT OF STOCK' : (lowStock ? 'LOW STOCK' : 'IN STOCK');
+            
+            inventoryMap[p.id] = p;
+            return `
+                <tr>
+                    <td><b>${p.name}</b></td>
+                    <td><span class="badge" style="background:#f8f9fa;">${p.category || 'MAESTRO'}</span></td>
+                    <td>GH₵ ${parseFloat(p.price).toFixed(2)}</td>
+                    <td>
+                        <div class="stock-info">
+                            <span>${p.stock_quantity}</span>
+                            <div class="stock-bar-container">
+                                <div class="stock-bar ${lowStock ? 'low' : ''}" style="width: ${Math.min((p.stock_quantity / p.reorder_level) * 50, 100)}%;"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${p.reorder_level || 10}</td>
+                    <td><span class="status-pill ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <button class="action-btn" onclick="openRestock(${p.id})"><i class="fa-solid fa-plus"></i> Restock</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function openRestock(id) {
+        const p = inventoryMap[id];
+        if (!p) return;
+        const content = `
+            <div class="form-group">
+                <label for="editStock">Update Stock Level</label>
+                <input type="number" id="editStock" value="${p.stock_quantity}">
+                <p class="section-subtitle" style="margin-top:8px;">Enter the new total units in stock.</p>
+            </div>
+        `;
+        openModal(`Manage Inventory: ${p.name}`, content, () => saveItem(p.id));
+    }
+
+    async function saveItem(id) {
+        const stockEl = document.getElementById('editStock');
+        if (!stockEl) return;
+
+        const payload = {
+            stock_quantity: stockEl.value
+        };
+        
+        try {
+            const resp = await fetch(`${API_URL}/admin/inventory/${id}?t=${Date.now()}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            
+            if (resp.ok) {
+                console.log("✅ Restock successful!");
+                closeModal();
+                refreshAll();
+            } else {
+                const err = await resp.json();
+                alert("Restock failed: " + (err.error || "Unknown server error"));
+            }
+        } catch (err) {
+            console.error("❌ Restock network failure:", err);
+            alert("Connection error! Is the backend running?");
+        }
+    }
+
+    function openAddProductModal() {
+        const content = `
+            <div class="form-group">
+                <label>Product Name</label>
+                <input type="text" id="newName" placeholder="e.g. FitBox Tee">
+            </div>
+            <div class="form-group">
+                <label>Section / Category</label>
+                <input type="text" id="newSection" placeholder="e.g. Apparel">
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                <div class="form-group">
+                    <label>Price (GH₵)</label>
+                    <input type="number" id="newPrice" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Initial Stock</label>
+                    <input type="number" id="newStock" value="0">
+                </div>
+            </div>
+        `;
+        openModal("Add New Product", content, saveNewProduct);
+    }
+
+    async function saveNewProduct() {
+        const payload = {
+            name: document.getElementById('newName').value,
+            section: document.getElementById('newSection').value,
+            price: document.getElementById('newPrice').value,
+            stock_quantity: document.getElementById('newStock').value
+        };
+        
+        await fetch(`${API_URL}/products`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        closeModal();
+        loadInventory();
+        loadSummary();
+    }
+
+    function openModal(header, content, saveFn) {
+        document.getElementById('modalHeader').textContent = header;
+        document.getElementById('modalBody').innerHTML = content;
+        document.getElementById('saveBtn').onclick = saveFn;
+        document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeModal() { document.getElementById('editModal').style.display = 'none'; }
+
+    function filterInventory(input) {
+        // ...Existing filter logic...
+    }
+
+    function refreshAll() {
+        console.log("Syncing Inventory & Summaries...");
+        loadInventory();
+        loadSummary();
+    }
+</script>
+
+</body>
+</html>

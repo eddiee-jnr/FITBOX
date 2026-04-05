@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>About Us- FitBox</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="shared.css">
+
+<style>
+body {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+body.fade-in {
+  opacity: 1;
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* NAVBAR SPECIFIC TO ABOUT */
+nav {
+  background: transparent;
+  color: white;
+  border-bottom: none;
+}
+
+nav.scrolled {
+  background: white;
+  color: black;
+  border-bottom: 1px solid #eee;
+}
+
+nav.scrolled a {
+  color: black;
+}
+
+
+/* HERO */
+.about-hero {
+  height: 70vh;
+  background: url('images/groupshoot.jfif') center/cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-align: center;
+  position: relative;
+}
+
+.about-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+}
+
+.hero-content {
+  position: relative;
+}
+
+.hero-content h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 50px;
+  color: #FDFDFD; /* In-between Visibility */
+}
+
+.hero-content p {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #FDFDFD; /* In-between Visibility */
+}
+
+/* SECTION */
+.about-section {
+  padding: 100px 60px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+/* IMAGE GRID */
+.image-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.image-grid img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+/* TEXT */
+.about-text h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 30px;
+  margin-bottom: 20px;
+}
+
+.about-text p {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.7;
+}
+
+.about-text button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: black;
+  color: white;
+  border: none;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* QUOTE */
+.quote {
+  background: #0D0D0D;
+  color: white;
+  text-align: center;
+  padding: 80px 40px;
+}
+
+.quote p {
+  max-width: 700px;
+  margin: auto;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.quote h4 {
+  margin-top: 20px;
+  font-weight: 400;
+  color: #aaa;
+}
+ 
+</style>
+</head>
+
+<body>
+
+<!-- NAV -->
+<nav id="navbar" class="transparent">
+  <div class="nav-left">
+    <a href="index.html" class="nav-link">HOME</a>
+    <a href="collection.html" class="nav-link">COLLECTION</a>
+    <a href="about.html" class="nav-link">ABOUT US</a>
+    <a href="contact.html" class="nav-link">CONTACT</a>
+  </div>
+
+  <div class="logo">FITBOX</div>
+
+  <div class="nav-right">
+    <!-- CART ICON -->
+	<div class="cart-wrapper" onclick="goToCart()">
+	<a href="cart.html">
+    <i class="fa-solid fa-cart-shopping icon"></i>
+  </a>
+  <!-- BADGE -->
+  <span id="cartCount" class="cart-count">0</span>
+</div>
+
+    <!-- ACCOUNT ICON -->
+	<a href="auth.html" onclick="handleAccountClick(event)">
+    <i class="fa-solid fa-user icon"></i>
+  </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="about-hero">
+  <div class="hero-content">
+    <h1>About FitBox</h1>
+    <p>Premium streetwear built for confidence and identity</p>
+  </div>
+</section>
+
+<!-- CONTENT -->
+<section class="about-section">
+
+  <!-- IMAGES -->
+  <div class="image-grid">
+    <img src="images/yellowblack.jpg">
+    <img src="images/duotwo.jpg">
+    <img src="images/groupthree.jpg">
+    <img src="images/jeansjorts.jpg">
+  </div>
+
+  <!-- TEXT -->
+  <div class="about-text">
+    <h2>Sustainable Elegance</h2>
+    <p>
+      FitBox is built on the idea of merging luxury with everyday streetwear.
+      Every piece is crafted with attention to detail, comfort, and timeless style.
+      Our mission is to redefine fashion through simplicity, quality, and identity.
+    </p>
+
+    <button><a href="collection.html" class="explore-btn">EXPLORE COLLECTION</a></button>
+  </div>
+
+</section>
+
+<!-- QUOTE -->
+<section class="quote">
+  <p>
+    “FitBox represents more than clothing. It’s a movement of confidence,
+    creativity, and premium street culture.”
+  </p>
+  <h4>— Founder, FitBox</h4>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+
+  <div class="footer-container">
+
+    <!-- CONTACT -->
+    <div class="footer-col">
+      <h4>CONTACT</h4>
+      <p>Premium streetwear brand built for style and confidence.</p>
+
+      <div class="socials">
+        <a href="#"><svg viewBox="0 0 24 24"><path d="M7 2C4.2 2 2 4.2 2 7v10c0 2.8 2.2 5 5 5h10c2.8 0 5-2.2 5-5V7c0-2.8-2.2-5-5-5H7zm5 5a5 5 0 110 10 5 5 0 010-10zm6.5-.8a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"/></svg></a>
+        <a href="#"><svg viewBox="0 0 24 24"><path d="M22 5.9c-.8.4-1.6.6-2.4.7.9-.5 1.5-1.3 1.8-2.2-.8.5-1.7.8-2.6 1-1.6-1.7-4.3-1.6-5.8.2-1 1.2-1.3 2.8-.8 4.3-3.5-.2-6.6-1.8-8.7-4.5-1.1 1.9-.5 4.3 1.3 5.5-.7 0-1.3-.2-1.9-.5 0 2 1.4 3.8 3.4 4.2-.6.2-1.2.2-1.8.1.5 1.7 2.1 2.9 3.9 2.9-1.5 1.2-3.4 1.8-5.3 1.8H2c2 1.3 4.3 2 6.7 2 8 0 12.4-6.7 12.4-12.4v-.6c.8-.6 1.5-1.3 2-2.1z"/></svg></a>
+        <a href="#"><svg viewBox="0 0 24 24"><path d="M22 12a10 10 0 10-11.5 9.9v-7H8v-3h2.5V9.5c0-2.5 1.5-3.9 3.7-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.7-1.6 1.5V12H17l-.5 3h-2.8v7A10 10 0 0022 12z"/></svg></a>
+      </div>
+    </div>
+
+    <!-- INFORMATION -->
+    <div class="footer-col">
+      <h4>INFORMATION</h4>
+      <ul>
+        <li>New Collection</li>
+        <li>Exclusive Product</li>
+        <li>Custom Wears</li>
+        <li>Our Story</li>
+      </ul>
+    </div>
+
+    <!-- NEWSLETTER -->
+    <div class="footer-col">
+      <h4>NEWSLETTER</h4>
+      <p>Subscribe to get updates on offers, discounts and new arrivals.</p>
+      <div class="newsletter">
+        <input type="email" id="newsletterEmail" placeholder="Enter your email">
+        <button onclick="subscribe()">→</button>
+      </div>
+      <p id="newsletterMsg" style="margin-top:10px; font-size:12px;"></p>
+    </div>
+
+    <!-- ADDRESS -->
+    <div class="footer-col">
+      <h4>ADDRESS</h4>
+      <p>4th Dr Akwei Onufugbortsui St</p>
+      <p>Ghana</p>
+      <p>fitboxclothing@gmail.com</p>
+      <p>+233 552 484 014</p>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    © 2026 FITBOX. All rights reserved.
+  </div>
+
+</footer>
+
+<script>
+
+/* NAV SCROLL EFFECT */
+window.addEventListener("scroll", () => {
+  document.getElementById("navbar").classList.toggle("scrolled", window.scrollY > 50);
+});
+
+const links = document.querySelectorAll(".nav-left a");
+
+links.forEach(link => {
+  if (window.location.href.includes(link.getAttribute("href"))) {
+    link.classList.add("active");
+  }
+});
+
+window.addEventListener("load", () => {
+  document.body.classList.add("fade-in");
+});
+
+document.querySelectorAll(".nav-link").forEach(link => {
+  link.addEventListener("click", function(e) {
+    e.preventDefault();
+    const url = this.href;
+
+    document.body.style.opacity = "0";
+
+    setTimeout(() => {
+      window.location.href = url;
+    }, 300);
+  });
+});
+
+/* ACCOUNT */
+function handleAccountClick(e) {
+ e.preventDefault();
+ 
+ const isLoggedIn = localStorage.getItem("loggedIn")
+ 
+ if (isLoggedIn == "true") {
+  window.location.href = "profile.html";
+  } else { 
+   window.location.href = "auth.html";
+   }
+} 
+
+function updateCartBadge() {
+  const c = JSON.parse(localStorage.getItem('cart')) || [];
+  const total = c.reduce((sum, item) => sum + item.qty, 0);
+  const badge = document.getElementById('cartCount');
+  if (badge) {
+    if (total > 0) {
+      badge.style.display = 'block';
+      badge.textContent = total;
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+}
+
+window.addEventListener('load', updateCartBadge);
+</script>
+
+</body>
+</html>

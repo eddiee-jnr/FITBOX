@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - FitBox Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../backend.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="main-content">
+    <header>
+        <div class="header-left">
+            <div class="title-group">
+                <div class="breadcrumb">FitBox / Dashboard</div>
+                <h1>Business Overview</h1>
+                <p class="header-subtitle" id="currentDate"></p>
+            </div>
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="Global search...">
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn-primary" onclick="window.location.reload()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
+    </header>
+
+    <!-- DASHBOARD KPI GRID -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="icon-label"><i class="fa-solid fa-sack-dollar"></i></div>
+            <h3>TOTAL REVENUE</h3>
+            <div class="value" id="revVal">GH₵ 0.00</div>
+            <div class="trend up"><i class="fa-solid fa-arrow-up"></i> 12% Growth</div>
+        </div>
+        <div class="stat-card">
+            <div class="icon-label" style="color:#3182ce;"><i class="fa-solid fa-box-open"></i></div>
+            <h3>TOTAL ORDERS</h3>
+            <div class="value" id="orderVal">0</div>
+            <div class="trend up"><i class="fa-solid fa-arrow-up"></i> 5% vs LW</div>
+        </div>
+        <div class="stat-card">
+            <div class="icon-label" style="color:#805ad5;"><i class="fa-solid fa-users"></i></div>
+            <h3>CUSTOMERS</h3>
+            <div class="value" id="activeUsersVal">0</div>
+            <div class="trend up"><i class="fa-solid fa-arrow-up"></i> 3 New Today</div>
+        </div>
+        <div class="stat-card">
+            <div class="icon-label" style="color:#555;"><i class="fa-solid fa-industry"></i></div>
+            <h3>SUPPLIERS</h3>
+            <div class="value" id="suppliersVal">0</div>
+            <div class="trend neutral"><i class="fa-solid fa-check"></i> All Active</div>
+        </div>
+    </div>
+
+    <!-- MAIN TRENDS ROW -->
+    <div class="dashboard-main-grid" style="display:grid; grid-template-columns: 1.5fr 1fr; gap:25px; margin-bottom:30px;">
+        <div class="data-section">
+            <div class="section-header">
+                <h2>Revenue Trends</h2>
+                <p class="section-subtitle">Weekly performance trajectory</p>
+            </div>
+            <div class="chart-container">
+                <canvas id="mainChart"></canvas>
+            </div>
+        </div>
+        <div class="data-section">
+            <div class="section-header">
+                <h2>Low Stock Alert</h2>
+                <button class="action-btn" onclick="window.location.href='orders-inventory.html'">Manage</button>
+            </div>
+            <div id="lowStockAlerts" class="alert-list">
+                <!-- Dynamic alerts -->
+            </div>
+        </div>
+    </div>
+
+    <!-- RECENT TRANSACTIONS -->
+    <div class="data-section">
+        <div class="section-header">
+            <h2>Recent Transactions</h2>
+            <button class="action-btn" onclick="window.location.href='finance-payments.html'">View All</button>
+        </div>
+        <table id="recentOrdersTable">
+            <thead>
+                <tr>
+                    <th>ORDER ID</th>
+                    <th>CUSTOMER</th>
+                    <th>AMOUNT</th>
+                    <th>STATUS</th>
+                    <th>DATE</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<script src="../shared-admin.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById('currentDate').textContent = `Today is ${new Date().toDateString()}`;
+        loadStats();
+    });
+
+    async function loadStats() {
+        try {
+            const res = await fetch(`${API_URL}/admin/stats`);
+            const data = await res.json();
+            
+            document.getElementById('revVal').textContent = `GH₵ ${parseFloat(data.revenue).toFixed(2)}`;
+            document.getElementById('orderVal').textContent = data.totalOrders;
+            document.getElementById('activeUsersVal').textContent = data.activeUsers;
+            document.getElementById('suppliersVal').textContent = data.suppliers;
+
+            const tbody = document.querySelector('#recentOrdersTable tbody');
+            tbody.innerHTML = data.recent.map(o => `
+                <tr>
+                    <td>#${o.id}</td>
+                    <td><b>${o.customer_name || 'Guest'}</b></td>
+                    <td>GH₵ ${o.total_amount}</td>
+                    <td><span class="badge ${o.status}">${o.status}</span></td>
+                    <td>${new Date(o.created_at).toLocaleDateString()}</td>
+                </tr>
+            `).join('');
+
+            loadTrendsChart();
+            loadLowStock();
+        } catch (err) { console.error(err); }
+    }
+
+    async function loadTrendsChart() {
+        const res = await fetch(`${API_URL}/admin/reports`);
+        const data = await res.json();
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.trends.map(t => t.date),
+                datasets: [{
+                    label: 'Daily Revenue',
+                    data: data.trends.map(t => t.daily_total),
+                    borderColor: '#000',
+                    backgroundColor: 'rgba(0,0,0,0.03)',
+                    tension: 0.4,
+                    fill: true,
+                    borderWidth: 2
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    }
+
+    async function loadLowStock() {
+        const res = await fetch(`${API_URL}/admin/inventory`);
+        const data = await res.json();
+        const low = data.filter(p => p.stock_quantity < 10);
+        const container = document.getElementById('lowStockAlerts');
+        
+        if(low.length === 0) {
+            container.innerHTML = '<p class="success alert-item"><i class="fa-solid fa-circle-check"></i> Stock levels are healthy.</p>';
+        } else {
+            container.innerHTML = low.map(p => `
+                <div class="alert-item">
+                    <span class="name">${p.name}</span>
+                    <span class="value danger">${p.stock_quantity} Left</span>
+                </div>
+            `).join('');
+        }
+    }
+</script>
+
+</body>
+</html>

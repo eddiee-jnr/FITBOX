@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice - FitBox Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/finance.css">
+</head>
+<body class="invoice-body">
+
+    <div class="invoice-page-container">
+        <div class="invoice-page-header">
+            <div class="invoice-page-logo">FITBOX</div>
+            <div class="invoice-page-title">
+                <h1>INVOICE</h1>
+                <p id="invId">FB-0000</p>
+                <p id="invDate">Jan 01, 2026</p>
+            </div>
+        </div>
+
+        <div class="invoice-details-grid">
+            <div class="invoice-detail-block">
+                <h4>Bill To</h4>
+                <p id="billName">Customer Name</p>
+                <p id="billEmail">customer@email.com</p>
+                <p id="billPhone">+233 00 000 0000</p>
+            </div>
+            <div class="invoice-detail-block">
+                <h4>Shipping Address</h4>
+                <p id="shipAddress">123 Street Name, Accra, Ghana</p>
+            </div>
+        </div>
+
+        <table class="invoice-page-table">
+            <thead>
+                <tr>
+                    <th style="width: 50%;">Item Description</th>
+                    <th style="text-align: center;">Qty</th>
+                    <th style="text-align: right;">Unit Price</th>
+                    <th style="text-align: right;">Amount</th>
+                </tr>
+            </thead>
+            <tbody id="itemsBody">
+                <!-- Dynamic Items -->
+            </tbody>
+        </table>
+
+        <div class="invoice-totals-section">
+            <div class="invoice-totals-table">
+                <div class="invoice-total-row">
+                    <span>Subtotal</span>
+                    <span id="subTotal">GH₵ 0.00</span>
+                </div>
+                <div class="invoice-total-row">
+                    <span>Delivery Fee</span>
+                    <span id="deliveryFee">GH₵ 0.00</span>
+                </div>
+                <div class="invoice-total-row invoice-grand-total">
+                    <span>Total</span>
+                    <span id="grandTotal">GH₵ 0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="invoice-page-footer">
+            <p>Thank you for choosing FitBox. This is a computer-generated document.</p>
+            <p>FitBox Streetwear & Lifestyle • Accra, Ghana</p>
+        </div>
+    </div>
+
+    <div class="invoice-btns no-print">
+        <button class="btn-primary" style="background:#555;" onclick="window.close()">Close</button>
+        <button class="btn-primary" onclick="window.print()">Print Invoice</button>
+    </div>
+
+    <script>
+        const API_URL = "http://localhost:3000/api";
+        
+        async function loadInvoice() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+            if(!id) return alert("No Order ID provided");
+
+            try {
+                const res = await fetch(`${API_URL}/admin/orders/${id}`);
+                const o = await res.json();
+
+                document.getElementById('invId').textContent = `FB-${o.id}`;
+                document.getElementById('invDate').textContent = new Date(o.created_at).toLocaleDateString();
+                document.getElementById('billName').textContent = o.customer_name || 'Guest Customer';
+                document.getElementById('billEmail').textContent = o.customer_email || '-';
+                document.getElementById('billPhone').textContent = o.phone_number || '-';
+                document.getElementById('shipAddress').textContent = o.shipping_address || 'N/A';
+
+                const tbody = document.getElementById('itemsBody');
+                tbody.innerHTML = o.items.map(i => `
+                    <tr>
+                        <td>
+                            <b>${i.product_name || 'Product'}</b><br>
+                            <small style="color:#777">Size: ${i.size || 'N/A'}</small>
+                        </td>
+                        <td style="text-align: center;">${i.quantity}</td>
+                        <td style="text-align: right;">GH₵ ${parseFloat(i.price_at_time).toFixed(2)}</td>
+                        <td style="text-align: right; font-weight: 600;">GH₵ ${(i.quantity * i.price_at_time).toFixed(2)}</td>
+                    </tr>
+                `).join('');
+
+                const subtotal = o.items.reduce((acc, i) => acc + (i.quantity * i.price_at_time), 0);
+                document.getElementById('subTotal').textContent = `GH₵ ${subtotal.toFixed(2)}`;
+                document.getElementById('deliveryFee').textContent = `GH₵ ${parseFloat(o.delivery_fee).toFixed(2)}`;
+                document.getElementById('grandTotal').textContent = `GH₵ ${parseFloat(o.total_amount).toFixed(2)}`;
+
+            } catch(e) {
+                console.error(e);
+                alert("Failed to load invoice data.");
+            }
+        }
+
+        window.onload = loadInvoice;
+    </script>
+</body>
+</html>

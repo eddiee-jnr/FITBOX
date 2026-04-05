@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Catalog - FitBox Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../backend.css">
+    <link rel="stylesheet" href="css/orders.css">
+</head>
+</head>
+<body>
+
+<div class="main-content">
+    <header>
+        <div class="header-left">
+            <div class="title-group">
+                <div class="breadcrumb">Orders / Product Management</div>
+                <h1>Product Catalogue</h1>
+                <p style="color:var(--admin-text-muted); font-size:12px; margin-top:5px;">Manage store product listings — add, edit, or remove products</p>
+            </div>
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="Search products..." onkeyup="filterProducts(this)">
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn-primary" onclick="openAddProductModal()">
+                <i class="fa-solid fa-plus"></i> Add Product
+            </button>
+        </div>
+    </header>
+
+    <div class="data-section">
+        <div class="section-header">
+            <div>
+                <h2>All Products</h2>
+                <p style="font-size:12px; color:var(--admin-text-muted);" id="productCount">0 products</p>
+            </div>
+        </div>
+        <table id="productsTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>NAME</th>
+                    <th>CATEGORY</th>
+                    <th>PRICE (₵)</th>
+                    <th>STOCK</th>
+                    <th>REORDER LEVEL</th>
+                    <th>ACTIONS</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamic Content -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div id="productModal" class="modal">
+    <div class="modal-content">
+        <i class="modal-close fa-solid fa-xmark" onclick="closeModal()"></i>
+        <h2 id="modalTitle">Add Product</h2>
+        
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+            <div class="form-group">
+                <label>Product Name</label>
+                <input type="text" id="pName" placeholder="e.g. Jeans Jorts">
+            </div>
+            <div class="form-group">
+                <label>Category</label>
+                <select id="pCategory">
+                    <option value="Maestro">Maestro</option>
+                    <option value="Legacy">Legacy</option>
+                    <option value="Custom">Custom</option>
+                    <option value="Styling">Styling</option>
+                    <option value="Skincare">Skincare</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+            <div class="form-group">
+                <label>Price (₵)</label>
+                <input type="number" id="pPrice" value="0.00" step="0.01">
+            </div>
+            <div class="form-group">
+                <label>Stock</label>
+                <input type="number" id="pStock" value="0">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Reorder Level</label>
+            <input type="number" id="pReorder" value="10">
+        </div>
+
+        <div class="form-group">
+            <label>Image URL</label>
+            <input type="text" id="pImage" value="assets/images/product.jpg">
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-primary btn-save" onclick="saveProduct()"><i class="fa-solid fa-save"></i> Save Product</button>
+            <button class="btn-primary btn-cancel" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script src="../shared-admin.js"></script>
+<script>
+    let products = [];
+    let editingId = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+        loadProducts();
+    });
+
+    async function loadProducts() {
+        try {
+            const res = await fetch(`${API_URL}/products`);
+            products = await res.json();
+            renderTable();
+        } catch (err) { console.error("Failed to load products", err); }
+    }
+
+    function renderTable(data = products) {
+        const tbody = document.querySelector('#productsTable tbody');
+        document.getElementById('productCount').textContent = `${data.length} products`;
+        
+        tbody.innerHTML = data.map(p => {
+            const statusClass = p.stock_quantity <= p.reorder_level ? 'low' : 'ok';
+            const statusText = p.stock_quantity <= p.reorder_level ? 'LOW STOCK' : 'OK';
+            
+            return `
+                <tr>
+                    <td class="product-id">PRD-${p.id.toString().padStart(3, '0')}</td>
+                    <td class="product-name">${p.name}</td>
+                    <td><span class="category-badge">${p.category ? p.category.toUpperCase() : 'GENERAL'}</span></td>
+                    <td>₵${parseFloat(p.price).toFixed(2)}</td>
+                    <td>
+                        <span class="status-pill ${statusClass}">${p.stock_quantity} (${p.stock_quantity <= 0 ? 'OUT' : statusText})</span>
+                    </td>
+                    <td>${p.reorder_level}</td>
+                    <td>
+                        <div class="action-icon edit" onclick="openEditModal(${p.id})"><i class="fa-solid fa-pen"></i></div>
+                        <div class="action-icon delete" onclick="deleteProduct(${p.id})"><i class="fa-solid fa-trash"></i></div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function filterProducts(input) {
+        const term = input.value.toLowerCase();
+        const filtered = products.filter(p => 
+            p.name.toLowerCase().includes(term) || 
+            (p.category && p.category.toLowerCase().includes(term))
+        );
+        renderTable(filtered);
+    }
+
+    function openAddProductModal() {
+        editingId = null;
+        document.getElementById('modalTitle').textContent = "Add Product";
+        document.getElementById('pName').value = "";
+        document.getElementById('pPrice').value = "0.00";
+        document.getElementById('pStock').value = "0";
+        document.getElementById('pReorder').value = "10";
+        document.getElementById('pImage').value = "assets/images/product.jpg";
+        document.getElementById('productModal').style.display = "flex";
+    }
+
+    function openEditModal(id) {
+        const p = products.find(i => i.id === id);
+        if (!p) return;
+        editingId = id;
+        document.getElementById('modalTitle').textContent = "Edit Product";
+        document.getElementById('pName').value = p.name;
+        document.getElementById('pCategory').value = p.category || "Maestro";
+        document.getElementById('pPrice').value = p.price;
+        document.getElementById('pStock').value = p.stock_quantity;
+        document.getElementById('pReorder').value = p.reorder_level;
+        document.getElementById('pImage').value = p.image_url;
+        document.getElementById('productModal').style.display = "flex";
+    }
+
+    function closeModal() {
+        document.getElementById('productModal').style.display = "none";
+    }
+
+    async function saveProduct() {
+        const payload = {
+            name: document.getElementById('pName').value,
+            category: document.getElementById('pCategory').value,
+            price: document.getElementById('pPrice').value,
+            stock_quantity: document.getElementById('pStock').value,
+            reorder_level: document.getElementById('pReorder').value,
+            image_url: document.getElementById('pImage').value
+        };
+
+        const url = editingId ? `${API_URL}/products/${editingId}` : `${API_URL}/products`;
+        const method = editingId ? 'PUT' : 'POST';
+
+        try {
+            await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            closeModal();
+            loadProducts();
+        } catch (err) { console.error("Save failed", err); }
+    }
+
+    async function deleteProduct(id) {
+        if (!confirm("Are you sure you want to remove this product?")) return;
+        try {
+            await fetch(`${API_URL}/products/${id}`, { method: 'DELETE' });
+            loadProducts();
+        } catch (err) { console.error("Delete failed", err); }
+    }
+</script>
+
+</body>
+</html>

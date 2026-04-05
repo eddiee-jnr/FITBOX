@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Database - FitBox Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../backend.css">
+    <link rel="stylesheet" href="css/crm.css">
+</head>
+</head>
+<body>
+
+<div class="main-content">
+    <header>
+        <div class="header-left">
+            <div class="title-group">
+                <div class="breadcrumb">CRM / Customers</div>
+                <h1>Customer Database</h1>
+                <p class="header-subtitle">Manage your registered user base and relationship history</p>
+            </div>
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="Search customers..." onkeyup="filterCustomers(this)">
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn-primary" onclick="alert('Exporting customer_database.csv...')"><i class="fa-solid fa-file-export"></i> Export CSV</button>
+        </div>
+    </header>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="icon-label"><i class="fa-solid fa-users"></i></div>
+            <h3>TOTAL REGISTERED</h3>
+            <div class="value" id="totalCust">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="icon-label" style="color:#38a169;"><i class="fa-solid fa-user-check"></i></div>
+            <h3>ACTIVE BUYERS</h3>
+            <div class="value" id="activeBuyers">0</div>
+        </div>
+        <div class="stat-card" style="cursor:pointer;" onclick="location.href='crm-enquiries.html'">
+            <div class="icon-label" style="color:#0288d1;"><i class="fa-solid fa-envelope"></i></div>
+            <h3>ENQUIRIES</h3>
+            <div class="value" id="totalEnq">0</div>
+        </div>
+    </div>
+
+    <div class="data-section">
+        <div class="section-header">
+            <div>
+                <h2>All Customers</h2>
+                <p id="custCountLabel" class="section-subtitle">0 users registered</p>
+            </div>
+        </div>
+        <table id="customersTable">
+            <thead>
+                <tr>
+                    <th>CUSTOMER ID</th>
+                    <th>FULL NAME</th>
+                    <th>EMAIL</th>
+                    <th>PHONE</th>
+                    <th>ORDERS</th>
+                    <th>REGISTERED</th>
+                    <th>ACTIONS</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamic Content -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- CLIENT PROFILE MODAL -->
+<div id="profileModal" class="modal">
+    <div class="modal-content">
+        <i class="modal-close fa-solid fa-xmark" onclick="closeModal()"></i>
+        <div class="profile-header">
+            <div class="profile-avatar" id="profAvatar">N</div>
+            <h2 class="profile-name" id="profName">Nana Borros</h2>
+            <div class="profile-email" id="profEmail">nborros@gmail.com</div>
+        </div>
+
+        <div class="profile-stats">
+            <div class="prof-stat-box">
+                <h4>Total Orders</h4>
+                <div class="stat-val" id="profOrders">0</div>
+            </div>
+            <div class="prof-stat-box">
+                <h4>Total Spent</h4>
+                <div class="stat-val spent" id="profSpent">₵ 0.00</div>
+            </div>
+        </div>
+
+        <div class="recent-orders-list">
+            <h4>Recent Activity</h4>
+            <div id="recentOrdersContainer">
+                <p style="text-align:center; color:#999; font-size:12px; padding:20px;">No orders placed yet.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="../shared-admin.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        loadSummary();
+        loadCustomers();
+    });
+
+    async function loadSummary() {
+        const res = await fetch(`${API_URL}/admin/customers/summary`);
+        const data = await res.json();
+        document.getElementById('totalCust').textContent = data.total;
+        document.getElementById('activeBuyers').textContent = data.active;
+        document.getElementById('totalEnq').textContent = data.enquiries;
+    }
+
+    async function loadCustomers() {
+        const res = await fetch(`${API_URL}/admin/customers`);
+        const data = await res.json();
+        const tbody = document.querySelector('#customersTable tbody');
+        document.getElementById('custCountLabel').textContent = `${data.length} users registered`;
+        
+        tbody.innerHTML = data.map(c => `
+            <tr>
+                <td class="customer-id">USR-${c.id.toString().padStart(5, '0')}</td>
+                <td class="customer-name">${c.name}</td>
+                <td>${c.email}</td>
+                <td>${c.phone || '-'}</td>
+                <td><span class="badge" style="background:#f0f0f0;">${c.order_count} ORDERS</span></td>
+                <td>${new Date(c.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })}</td>
+                <td>
+                    <button class="action-btn" onclick="openProfile(${c.id})"><i class="fa-solid fa-eye"></i> View</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async function openProfile(id) {
+        try {
+            const res = await fetch(`${API_URL}/admin/customers/${id}/profile`);
+            const p = await res.json();
+            
+            document.getElementById('profAvatar').textContent = p.name.charAt(0);
+            document.getElementById('profName').textContent = p.name;
+            document.getElementById('profEmail').textContent = p.email;
+            document.getElementById('profOrders').textContent = p.totalOrders;
+            document.getElementById('profSpent').textContent = `₵ ${parseFloat(p.totalSpent).toFixed(2)}`;
+            
+            const container = document.getElementById('recentOrdersContainer');
+            if (p.recentOrders && p.recentOrders.length > 0) {
+                container.innerHTML = p.recentOrders.map(o => `
+                    <div class="recent-order-item">
+                        <span>Order #${o.id} - ${new Date(o.created_at).toLocaleDateString()}</span>
+                        <span style="font-weight:700;">₵ ${parseFloat(o.total_amount).toFixed(2)}</span>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = '<p style="text-align:center; color:#999; font-size:12px; padding:20px;">No orders placed yet.</p>';
+            }
+            
+            document.getElementById('profileModal').style.display = "flex";
+        } catch (err) { console.error("Profile load failed", err); }
+    }
+
+    function closeModal() {
+        document.getElementById('profileModal').style.display = "none";
+    }
+
+    function filterCustomers(input) {
+        const filter = input.value.toUpperCase();
+        const rows = document.getElementById("customersTable").getElementsByTagName("tr");
+        for (let i = 1; i < rows.length; i++) {
+            const text = rows[i].textContent.toUpperCase();
+            rows[i].style.display = text.indexOf(filter) > -1 ? "" : "none";
+        }
+    }
+</script>
+
+</body>
+</html>

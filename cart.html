@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cart - FitBox</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+
+<style>
+body{
+  background:#f8f8f8;
+}
+
+/* PAGE */
+.container{
+  margin-top:140px;
+  padding:40px 80px;
+}
+
+/* TITLE */
+h1{
+  font-family:'Playfair Display', serif;
+  font-size:36px;
+  margin-bottom:30px;
+}
+
+/* CART LAYOUT */
+.cart-wrapper{
+  display:grid;
+  grid-template-columns: 2fr 1fr;
+  gap:40px;
+}
+
+/* ITEMS */
+.cart-items{
+  background:white;
+  padding:30px;
+  border-radius:8px;
+}
+
+.cart-item{
+  display:grid;
+  grid-template-columns:120px 1fr auto;
+  gap:20px;
+  align-items:center;
+  margin-bottom:25px;
+  border-bottom:1px solid #eee;
+  padding-bottom:20px;
+}
+
+.cart-item img{
+  width:100%;
+  height:120px;
+  object-fit:cover;
+  border-radius:6px;
+}
+
+.cart-info h3{
+  font-size:16px;
+}
+
+.cart-info p{
+  color:#777;
+  font-size:13px;
+  margin-top:5px;
+}
+
+/* QTY */
+.qty{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  margin-top:10px;
+}
+
+.qty button{
+  padding:5px 10px;
+  border:1px solid #ccc;
+  background:white;
+  cursor:pointer;
+}
+
+/* PRICE */
+.price{
+  font-weight:500;
+}
+
+/* REMOVE */
+.remove{
+  color:#999;
+  font-size:12px;
+  cursor:pointer;
+  margin-top:8px;
+}
+
+.back-btn{
+  background:none;
+  border:none;
+  font-family: 'Playfair Display', serif;
+  font-size:16px;
+  font-weight: 600;
+  color:#111;
+  cursor:pointer;
+  margin-bottom:20px;
+  letter-spacing:1px;
+  transition:0.3s;
+}
+
+.back-btn:hover{
+  opacity: 0.5;
+}
+
+/* SUMMARY */
+.summary{
+  background:white;
+  padding:30px;
+  border-radius:8px;
+  height:fit-content;
+}
+
+.summary h2{
+  font-family:'Playfair Display', serif;
+  margin-bottom:20px;
+}
+
+.summary p{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:10px;
+  color:#555;
+}
+
+.total{
+  font-size:18px;
+  font-weight:500;
+  margin-top:20px;
+}
+
+/* BUTTON */
+.checkout{
+  margin-top:20px;
+  width:100%;
+  padding:14px;
+  border:none;
+  background:black;
+  color:white;
+  cursor:pointer;
+  letter-spacing:2px;
+  transition:0.3s;
+}
+
+.checkout:hover{
+  background:#333;
+}
+
+/* EMPTY */
+.empty{
+  text-align:center;
+  color:#777;
+}
+
+/* ANIMATION */
+.cart-item{
+  animation:fadeUp 0.5s ease;
+}
+
+@keyframes fadeUp{
+  from{opacity:0; transform:translateY(10px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-links nav-left">
+    <a href="index.html">HOME</a>
+    <a href="collection.html">COLLECTION</a>
+  </div>
+  <a href="index.html" class="logo">FITBOX</a>
+  <div class="nav-links right">
+    <a href="profile.html">PROFILE</a>
+  </div>
+</nav>
+
+<div class="container">
+
+<button class="back-btn" onclick="goBack()">← Continue Shopping</button>
+
+<h1>Your Cart</h1>
+
+<div class="cart-wrapper">
+
+  <!-- LEFT -->
+  <div class="cart-items" id="cartItems"></div>
+
+  <!-- RIGHT -->
+  <div class="summary">
+    <h2>Summary</h2>
+    <p>Subtotal <span id="subtotal">GH₵ 0</span></p>
+    <p>Delivery <span id="deliveryEstimate">Calculated at checkout</span></p>
+    <p class="total">Total <span id="total">GH₵ 0</span></p>
+    <button class="checkout" onclick="window.location.href='checkout.html'">CHECKOUT</button>
+  </div>
+
+</div>
+
+</div>
+
+<script>
+
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+function renderCart(){
+  const container = document.getElementById("cartItems");
+  container.innerHTML = "";
+
+  if(cart.length === 0){
+    container.innerHTML = "<p class='empty'>Your cart is empty.</p>";
+    updateTotal();
+    return;
+  }
+
+  cart.forEach((item, index)=>{
+    container.innerHTML += `
+      <div class="cart-item">
+        <img src="${item.img || 'https://placehold.co/200x200/0d0d0d/white?text=FitBox&font=Playfair+Display'}">
+        
+        <div class="cart-info">
+          <h3>${item.name}</h3>
+          <p>Size: ${item.size}</p>
+
+          <div class="qty">
+            <button onclick="changeQty(${index}, -1)">-</button>
+            <span>${item.qty}</span>
+            <button onclick="changeQty(${index}, 1)">+</button>
+          </div>
+
+          <div class="remove" onclick="removeItem(${index})">Remove</div>
+        </div>
+
+        <div class="price">GH₵ ${item.price * item.qty}</div>
+      </div>
+    `;
+  });
+
+  updateTotal();
+}
+
+function goBack(){
+  window.location.href = "collection.html";
+}
+
+function changeQty(i, val){
+  cart[i].qty += val;
+  if(cart[i].qty < 1) cart[i].qty = 1;
+  saveCart();
+}
+
+function removeItem(i){
+  cart.splice(i,1);
+  saveCart();
+}
+
+function updateTotal(){
+  let total = 0;
+
+  cart.forEach(item=>{
+    total += item.price * item.qty;
+  });
+
+  let deliveryPhrase = total > 300 ? "Free" : "GH₵ 10.00 - 40.00";
+
+  document.getElementById("subtotal").textContent = `GH₵ ${total.toFixed(2)}`;
+  document.getElementById("deliveryEstimate").textContent = deliveryPhrase;
+  document.getElementById("total").textContent = `GH₵ ${total.toFixed(2)} + Tax`;
+}
+
+function saveCart(){
+  localStorage.setItem("cart", JSON.stringify(cart));
+  renderCart();
+}
+
+renderCart();
+
+</script>
+
+</body>
+</html>

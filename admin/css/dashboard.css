@@ -1,0 +1,89 @@
+/* Dashboard Module Styles */
+
+/* ── KPI TRENDS ── */
+.trend {
+    font-size: 11px;
+    margin-top: 10px;
+    font-weight: 600;
+}
+
+.trend.up { color: #38a169; }
+.trend.down { color: #e53e3e; }
+.trend.neutral { color: #718096; }
+
+/* ── CHART CONTAINER ── */
+.chart-container {
+    height: 350px;
+    position: relative;
+    margin-top: 20px;
+}
+
+/* ── ALERTS & NOTICES ── */
+.alert-list {
+    padding-top: 10px;
+}
+
+.alert-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f7f7f7;
+}
+
+.alert-item:last-child {
+    border-bottom: none;
+}
+
+.alert-item .name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+}
+
+.alert-item .value {
+    font-weight: 700;
+}
+
+.alert-item .value.danger {
+    color: #e53e3e;
+}
+
+.alert-item .value.success {
+    color: #38a169;
+}
+
+/* ── ACADEMIC NOTICE ── */
+.academic-notice {
+    margin-top: 40px;
+    padding: 20px;
+    background: #fff8e1;
+    border-radius: 12px;
+    border: 1px solid #ffe082;
+    color: #856404;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.academic-notice b {
+    color: #744210;
+}
+
+/* ── RESPONSIVE DASHBOARD ── */
+@media screen and (max-width: 1200px) {
+    .dashboard-main-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}

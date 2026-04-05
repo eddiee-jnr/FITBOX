@@ -1,0 +1,284 @@
+/* ── FONTS & RESET ── */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  color: #0D0D0D;
+}
+
+/* ── NAVBAR ── */
+nav {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  padding: 25px 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  border-bottom: 1px solid #eee;
+  z-index: 100;
+  transition: 0.4s;
+  color: black;
+}
+
+.nav-left a {
+  margin-right: 25px;
+  text-decoration: none;
+  color: inherit;
+  font-size: 13px;
+  letter-spacing: 1px;
+  position: relative;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.nav-left a:hover {
+  opacity: 0.5;
+}
+
+.nav-left a::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  left: 0;
+  bottom: -5px;
+  transition: 0.3s;
+  opacity: 0;
+}
+
+.nav-left a:hover::after, .nav-left a.active::after {
+  opacity: 1;
+}
+
+.logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  letter-spacing: 3px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.nav-right {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+/* ── CART ICON & BADGE ── */
+.cart-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.cart-count {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  background: #333;
+  color: white;
+  font-size: 10px;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 18px;
+  display: none;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  font-size: 16px !important;
+  cursor: pointer;
+  color: #333 !important; /* Grey Charcoal */
+  fill: #333;
+  transition: opacity 0.2s, color 0.3s;
+  line-height: 1;
+}
+
+.icon:hover {
+  opacity: 0.5;
+}
+
+/* Icons start white over dark hero, but switch back to charcoal when scrolled */
+nav.transparent:not(.scrolled) .icon {
+  color: white !important;
+  fill: white;
+}
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: black;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 4px;
+  font-size: 13px;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s, bottom 0.3s;
+}
+
+.toast.show {
+  opacity: 1;
+  visibility: visible;
+  bottom: 40px;
+}
+
+/* ── PRODUCT STATUS BADGES ── */
+.sold-out-badge {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: rgba(255, 255, 255, 0.95);
+  color: black;
+  padding: 6px 12px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  z-index: 10;
+  text-transform: uppercase;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.product-out-of-stock {
+  opacity: 0.6;
+}
+
+.product-out-of-stock img {
+  filter: grayscale(100%);
+}
+
+.quote {
+  padding: 60px 10%;
+  background: white;
+  text-align: center;
+  color: black;
+  border-top: 1px solid #f0f0f0;
+}
+
+.quote p {
+  font-size: 15px;
+  line-height: 1.8;
+  max-width: 800px;
+  margin: 0 auto 20px;
+  font-style: italic;
+  font-weight: 300;
+}
+
+.quote h4 {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #555;
+}
+
+/* ── FOOTER ── */
+.footer {
+  background: #0D0D0D;
+  color: #fff;
+  padding: 60px 60px 30px;
+}
+
+.footer-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+}
+
+.footer-col h4 {
+  font-size: 11px;
+  margin-bottom: 12px;
+  letter-spacing: 2px;
+  color: #888;
+}
+
+.footer-col p,
+.footer-col li {
+  font-size: 13px;
+  color: #aaa;
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+.footer-col ul {
+  list-style: none;
+}
+
+.socials {
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.socials svg {
+  width: 20px;
+  height: 20px;
+  fill: white;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.socials svg:hover {
+  fill: #888;
+  transform: scale(1.2);
+}
+
+.footer-bottom {
+  text-align: center;
+  margin-top: 30px;
+  font-size: 12px;
+  color: #555;
+  border-top: 1px solid #222;
+  padding-top: 24px;
+}
+
+/* ── GLOBALS ── */
+.hidden {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: 0.8s ease;
+}
+
+.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* MOBILE QUERIES */
+@media(max-width: 900px){
+  .footer-container {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media(max-width: 500px){
+  .footer-container {
+    grid-template-columns: 1fr;
+    padding: 40px 30px;
+  }
+  nav {
+    padding: 15px 30px;
+  }
+}
