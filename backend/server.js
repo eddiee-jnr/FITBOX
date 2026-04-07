@@ -153,12 +153,12 @@ app.post('/api/orders', async (req, res) => {
     for (const item of cart_items) {
       await db.execute(
         'INSERT INTO order_items (order_id, product_id, quantity, price_at_time, size) VALUES (?, ?, ?, ?, ?)',
-        [orderId, item.id || 1, item.qty, item.price, item.size]
+        [orderId, item.id, item.qty, item.price, item.size]
       );
       // Decrement stock
       await db.execute(
         'UPDATE products SET stock_quantity = stock_quantity - ? WHERE id = ?',
-        [item.qty, item.id || 1]
+        [item.qty, item.id]
       );
     }
     await db.execute('INSERT INTO payments (order_id, amount, payment_status) VALUES (?, ?, "pending")', [orderId, total_amount]);
@@ -171,13 +171,27 @@ app.post('/api/orders', async (req, res) => {
 
 app.get('/api/orders/customer/:customerId', async (req, res) => {
   try {
-    const [orders] = await db.execute(`
-      SELECT o.*, (SELECT GROUP_CONCAT(CONCAT(p.name, ' (', oi.size, ') x', oi.quantity) SEPARATOR ', ') 
-      FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE oi.order_id = o.id) as items_summary
-      FROM orders o WHERE o.customer_id = ? ORDER BY o.created_at DESC
-    `, [req.params.customerId]);
+    // 1. Fetch orders
+    const [orders] = await db.execute('SELECT * FROM orders WHERE customer_id = ? ORDER BY created_at DESC', [req.params.customerId]);
+    
+    // 2. Fetch all items for these orders
+    for (let order of orders) {
+      const [items] = await db.execute(`
+        SELECT oi.*, p.name as product_name, p.image_url 
+        FROM order_items oi 
+        JOIN products p ON oi.product_id = p.id 
+        WHERE oi.order_id = ?
+      `, [order.id]);
+      order.items = items;
+      // Maintain backwards compatibility for items_summary if needed
+      order.items_summary = items.map(i => `${i.product_name} (${i.size}) x${i.quantity}`).join(', ');
+    }
+    
     res.json(orders);
-  } catch (error) { res.status(500).json({ error: 'Failed to fetch order history' }); }
+  } catch (error) { 
+    console.error("Order history failed:", error);
+    res.status(500).json({ error: 'Failed to fetch order history' }); 
+  }
 });
 
 // ── ADMIN MANAGEMENT API ──
@@ -482,11 +496,28 @@ app.get('/api/admin/emarket/stats', async (req, res) => {
   } catch (error) { res.status(500).json({ error: 'E-market stats failed' }); }
 });
 
+// ── CRM ENQUIRIES (Feedback) ──
+app.get('/api/admin/feedback', async (req, res) => {
+  try {
+    const [rows] = await db.execute('SELECT * FROM feedback ORDER BY created_at DESC');
+    res.json(rows);
+  } catch (error) { res.status(500).json({ error: 'Failed to load enquiries' }); }
+});
+
+app.put('/api/admin/feedback/:id/status', async (req, res) => {
+  const { status } = req.body; // 'read' or 'replied'
+  try {
+    await db.execute('UPDATE feedback SET status = ? WHERE id = ?', [status, req.params.id]);
+    res.json({ message: 'Enquiry status updated' });
+  } catch (error) { res.status(500).json({ error: 'Status update failed' }); }
+});
+
 // Catch-all 404 for API
 app.use('/api', (req, res) => {
   console.log(`[404] API Route not found: ${req.method} ${req.originalUrl}`);
   res.status(404).json({ error: `API route ${req.originalUrl} not found` });
 });
+
 
 app.listen(PORT, () => {
   console.log(`FitBox Server is humming on http://localhost:${PORT} 🚀`);

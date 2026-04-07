@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8">`n<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Authentication</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
@@ -55,28 +55,49 @@ body {
 }
 
 /* LOGO */
-.form-logo {
+.logo-container {
   position: absolute;
   top: 20px;
   right: 20px;
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
-  border-radius: 12px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  z-index: 10;
+  
   /* ANIMATION */
   opacity: 0;
   transform: translateY(-20px);
   animation: logoFade 1s ease forwards;
   animation-delay: 0.3s;
+}
 
+.form-logo {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.15);
   transition: all 0.3s ease;
 }
 
-.form-logo:hover {
+.logo-text {
+  font-size: 8px;
+  color: #888;
+  margin-top: 5px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  transition: color 0.3s ease;
+}
+
+.logo-container:hover .form-logo {
   transform: scale(1.08);
   box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+}
+
+.logo-container:hover .logo-text {
+  color: #111;
 }
 
 /* OPTIONAL GLOW (premium subtle) */
@@ -198,7 +219,13 @@ button:hover {
 .overlay-text p {
   font-size: 14px;
 }
-</style>
+
+    /* AUTH RESPONSIVE */
+    @media (max-width: 768px) {
+      .auth-container { flex-direction: column; margin-top: 70px; min-height: auto; }
+      .auth-left { display: none; }
+      .auth-right { padding: 40px 20px; width: 100%; }
+    }</style>
 
 </head>
 <body>
@@ -217,8 +244,9 @@ button:hover {
   <div class="form-panel">
 
     <!--  LOGO -->
-	<a href="index.html">
-    <img src="images/fitboxlogo.jpg" class="form-logo">
+    <a href="index.html" class="logo-container">
+      <img src="images/fitboxlogo.jpg" class="form-logo">
+      <span class="logo-text">Go to Home</span>
     </a>
 
     <!-- SIGN IN -->
@@ -364,7 +392,7 @@ async function login() {
     if (data.role === 'admin') {
       localStorage.setItem("admin_user", JSON.stringify(data));
       localStorage.setItem("admin_loggedIn", "true");
-      window.location.href = "admin-dashboard.html";
+      window.location.href = "admin/admin-dashboard.html";
     } else {
       localStorage.setItem("customer_user", JSON.stringify(data));
       localStorage.setItem("customer_loggedIn", "true");

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8">`n<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Collection - FitBox</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
@@ -254,35 +254,47 @@ section {
   cursor: pointer;
 }
 
-</style>
+
+    /* PRODUCT RESPONSIVE */
+    @media (max-width: 768px) {
+      .product-detail { flex-direction: column !important; margin-top: 70px; padding: 20px 5% !important; }
+      .product-images { width: 100% !important; }
+      .product-info { width: 100% !important; padding: 0 !important; }
+      .product-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    }
+    @media (max-width: 480px) {
+      .size-options { flex-wrap: wrap; gap: 8px; }
+      .product-grid { grid-template-columns: 1fr 1fr !important; }
+    }</style>
 </head>
 
 <body>
 
-<!-- NAV -->
-<nav>
+<nav id="navbar">
   <div class="nav-left">
     <a href="index.html">HOME</a>
     <a href="collection.html">COLLECTION</a>
     <a href="about.html">ABOUT US</a>
+    <a href="contact.html">CONTACT</a>
   </div>
 
-  <div class="logo">FITBOX</div>
+  <a href="index.html" class="logo">FITBOX</a>
 
   <div class="nav-right">
-    <div class="cart-wrapper" onclick="window.location.href='cart.html'">
-      <!-- CART ICON -->
-      <i class="fa-solid fa-cart-shopping icon"></i>
-      <!-- BADGE -->
+    <div class="cart-wrapper" onclick="goToCart()">
+      <a href="cart.html">
+        <i class="fa-solid fa-cart-shopping icon"></i>
+      </a>
       <span id="cartCount" class="cart-count">0</span>
     </div>
 
-    <!-- ACCOUNT ICON -->
-    <a href="auth.html" onclick="handleAccountClick(event)">
+    <a href="auth.html" id="accountLink" class="nav-link">
       <i class="fa-solid fa-user icon"></i>
     </a>
   </div>
 </nav>
+
+<script src="shared.js"></script>
 
 <!-- HEADER -->
 <section class="header">
@@ -442,9 +454,12 @@ const products = [
 let selectedSize = "";
 let quantity = 1;
 
+let currentProductId = null;
+
 function openModal(product){
   document.getElementById("quickView").style.display = "flex";
 
+  currentProductId = product.dataset.id;
   document.getElementById("mainImg").src = product.dataset.img;
   document.getElementById("modalTitle").textContent = product.dataset.name;
   document.getElementById("modalPrice").textContent = product.dataset.price;
@@ -481,8 +496,9 @@ function addToCart(){
   }
 
   const item = {
+    id: currentProductId,
     name: document.getElementById("modalTitle").textContent,
-    price: document.getElementById("modalPrice").textContent,
+    price: document.getElementById("modalPrice").textContent.replace("GH₵ ", ""),
     img: document.getElementById("mainImg").src,
     size: selectedSize,
     qty: quantity
@@ -516,7 +532,7 @@ function loadProducts(sectionId){
   for(let i=0;i<10;i++){
     let p = products[i % products.length];
     grid.innerHTML += `
-      <div class="product" data-category="${p.category}">
+      <div class="product" data-id="${(i%4)+129}" data-category="${p.category}" data-name="${p.name}" data-price="${p.price}" data-img="${p.img}" onclick="openModal(this)">
         <img src="${p.img}">
         <h4>${p.name}</h4>
         <p>GH₵ ${p.price}</p>
@@ -552,28 +568,7 @@ function handleAccountClick(e){
   }
 }
 
-function updateCartBadge() {
-  const c = JSON.parse(localStorage.getItem('cart')) || [];
-  const total = c.reduce((sum, item) => sum + item.qty, 0);
-  const badge = document.getElementById('cartCount');
-  if (badge) {
-    if (total > 0) {
-      badge.style.display = 'block';
-      badge.textContent = total;
-    } else {
-      badge.style.display = 'none';
-    }
-  }
-}
-
-window.addEventListener('load', updateCartBadge);
-
-const links = document.querySelectorAll(".nav-left a");
-links.forEach(link => {
-  if (window.location.href.includes(link.getAttribute("href"))) {
-    link.classList.add("active");
-  }
-});
+// Centralized badge updates and active link highlighting are now handled in shared.js
 </script>
 
 </body>

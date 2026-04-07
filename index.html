@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FitBox</title>
 
+
   <link
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500&display=swap"
     rel="stylesheet">
@@ -235,6 +236,88 @@
     .newsletter button:hover {
       background: #ddd;
     }
+    /* MODAL */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .modal-box {
+      background: white;
+      width: 800px;
+      max-width: 95%;
+      padding: 30px;
+      position: relative;
+    }
+
+    .close-btn {
+      position: absolute;
+      right: 20px;
+      top: 10px;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    .modal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+
+    .modal-images img {
+      width: 100%;
+      height: 350px;
+      object-fit: cover;
+    }
+
+    .modal-info h2 { font-family: 'Playfair Display', serif; }
+    .modal-info p { color: #777; margin: 10px 0; }
+
+    .size-options { display: flex; gap: 10px; margin-top: 10px; }
+    .size-options span { border: 1px solid #ccc; padding: 8px 12px; cursor: pointer; }
+    .size-options span.active { background: black; color: white; }
+
+    .quantity { margin: 20px 0; display: flex; gap: 15px; align-items: center; }
+    .quantity button { padding: 5px 10px; cursor: pointer; }
+
+    .add-cart { width: 100%; padding: 12px; background: black; color: white; border: none; cursor: pointer; }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: black;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 4px;
+      opacity: 0;
+      visibility: hidden;
+      transition: 0.3s;
+      z-index: 1000;
+    }
+    .toast.show { opacity: 1; visibility: visible; bottom: 30px; }
+
+    /* ── INDEX RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 38px; }
+      .section { padding: 50px 20px; }
+      .grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+      .modal-grid { grid-template-columns: 1fr; }
+      .modal-images img { height: 220px; }
+    }
+
+    @media (max-width: 480px) {
+      .hero h1 { font-size: 28px; }
+      .section { padding: 35px 15px; }
+      .grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .product img { height: 200px; }
+    }
   </style>
 </head>
 
@@ -243,30 +326,30 @@
   <!-- NAV -->
   <nav id="navbar" class="transparent">
     <div class="nav-left">
-      <a href="index.html" class="nav-link">HOME</a>
-      <a href="collection.html" class="nav-link">COLLECTION</a>
-      <a href="about.html" class="nav-link">ABOUT US</a>
-      <a href="contact.html" class="nav-link">CONTACT</a>
+      <a href="index.html">HOME</a>
+      <a href="collection.html">COLLECTION</a>
+      <a href="about.html">ABOUT US</a>
+      <a href="contact.html">CONTACT</a>
     </div>
 
     <div class="logo">FITBOX</div>
 
     <div class="nav-right">
-      <!-- CART ICON -->
       <div class="cart-wrapper" onclick="goToCart()">
         <a href="cart.html">
           <i class="fa-solid fa-cart-shopping icon"></i>
         </a>
-        <!-- BADGE -->
         <span id="cartCount" class="cart-count">0</span>
       </div>
 
       <!-- ACCOUNT ICON -->
-      <a href="auth.html" onclick="handleAccountClick(event)">
+      <a href="auth.html" id="accountLink" class="nav-link">
         <i class="fa-solid fa-user icon"></i>
       </a>
     </div>
   </nav>
+
+  <script src="shared.js"></script>
 
   <!-- HERO -->
   <section class="hero">
@@ -280,24 +363,60 @@
   <section class="section hidden">
     <h2>SHOP THE COLLECTION</h2>
     <div class="grid">
-      <div class="product"><img src="images/whitepants.jpg" alt="White Protoct grey sweatpants">
+      <div class="product" data-id="141" data-name="Protoct Grey Sweatpants" data-price="70" data-img="images/whitepants.jpg" onclick="openModal(this)">
+        <img src="images/whitepants.jpg" alt="White Protoct grey sweatpants">
         <h4>Protoct Grey Sweatpants</h4>
         <p>GH₵ 70</p>
       </div>
-      <div class="product"><img src="images/ancientshirt.jpg" alt="Basquiat Beast Button-Up shirt">
+      <div class="product" data-id="147" data-name="Basquiat Beast Button-Up" data-price="170" data-img="images/ancientshirt.jpg" onclick="openModal(this)">
+        <img src="images/ancientshirt.jpg" alt="Basquiat Beast Button-Up shirt">
         <h4>Basquiat Beast Button-Up</h4>
         <p>GH₵ 170</p>
       </div>
-      <div class="product"><img src="images/shein.jpg" alt="Pinstripe Half Zip Oversized Denim shirt">
+      <div class="product" data-id="154" data-name="Pinstripe Half Zip Oversized Denim shirt" data-price="250" data-img="images/shein.jpg" onclick="openModal(this)">
+        <img src="images/shein.jpg" alt="Pinstripe Half Zip Oversized Denim shirt">
         <h4>Pinstripe Half Zip Oversized Denim shirt</h4>
         <p>GH₵ 250</p>
       </div>
-      <div class="product"><img src="images/arsenal.jpg" alt="1994/1996 Arsenal Home Jersey">
+      <div class="product" data-id="130" data-name="1994/1996 Arsenal Home Jersey" data-price="250" data-img="images/arsenal.jpg" onclick="openModal(this)">
+        <img src="images/arsenal.jpg" alt="1994/1996 Arsenal Home Jersey">
         <h4>1994/1996 Arsenal Home Jersey</h4>
         <p>GH₵ 250</p>
       </div>
-    </div>
   </section>
+
+  <!-- QUICK VIEW MODAL -->
+  <div id="quickView" class="modal">
+    <div class="modal-box">
+      <span class="close-btn" onclick="closeModal()">&times;</span>
+      <div class="modal-grid">
+        <div class="modal-images">
+          <img id="mainImg" src="">
+        </div>
+        <div class="modal-info">
+          <h2 id="modalTitle"></h2>
+          <p id="modalPrice"></p>
+          <div class="sizes">
+            <p>Select Size</p>
+            <div class="size-options">
+              <span onclick="selectSize(this)">S</span>
+              <span onclick="selectSize(this)">M</span>
+              <span onclick="selectSize(this)">L</span>
+              <span onclick="selectSize(this)">XL</span>
+            </div>
+          </div>
+          <div class="quantity">
+            <button onclick="changeQty(-1)">-</button>
+            <span id="qty">1</span>
+            <button onclick="changeQty(1)">+</button>
+          </div>
+          <button class="add-cart" onclick="addToCart()">ADD TO CART</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">Added to cart</div>
 
   <!-- BANNER -->
   <section class="banner hidden">
@@ -388,13 +507,6 @@
       document.getElementById("navbar").classList.toggle("scrolled", window.scrollY > 50);
     });
 
-    const links = document.querySelectorAll(".nav-left a");
-    links.forEach(link => {
-      if (window.location.href.includes(link.getAttribute("href"))) {
-        link.classList.add("active");
-      }
-    });
-
     window.addEventListener("load", () => {
       document.body.classList.add("fade-in");
     });
@@ -453,21 +565,66 @@
 
     document.querySelectorAll(".hidden").forEach(el => observer.observe(el));
 
-    function updateCartBadge() {
-      const c = JSON.parse(localStorage.getItem('cart')) || [];
-      const total = c.reduce((sum, item) => sum + item.qty, 0);
-      const badge = document.getElementById('cartCount');
-      if (badge) {
-        if (total > 0) {
-          badge.style.display = 'block';
-          badge.textContent = total;
-        } else {
-          badge.style.display = 'none';
-        }
-      }
+    // Centralized badge updates and active link highlighting are now handled in shared.js
+
+    let selectedSize = "";
+    let quantity = 1;
+    let currentProductId = null;
+
+    function openModal(product){
+      document.getElementById("quickView").style.display = "flex";
+      currentProductId = product.dataset.id;
+      document.getElementById("mainImg").src = product.dataset.img;
+      document.getElementById("modalTitle").textContent = product.dataset.name;
+      document.getElementById("modalPrice").textContent = "GH₵ " + product.dataset.price;
+      quantity = 1;
+      document.getElementById("qty").textContent = 1;
+      selectedSize = "";
+      document.querySelectorAll(".size-options span").forEach(s => s.classList.remove("active"));
     }
 
-    window.addEventListener('load', updateCartBadge);
+    function closeModal() {
+      document.getElementById("quickView").style.display = "none";
+    }
+
+    function selectSize(el) {
+      document.querySelectorAll(".size-options span").forEach(s => s.classList.remove("active"));
+      el.classList.add("active");
+      selectedSize = el.textContent;
+    }
+
+    function changeQty(val) {
+      quantity = Math.max(1, quantity + val);
+      document.getElementById("qty").textContent = quantity;
+    }
+
+    function addToCart() {
+      if (!selectedSize) {
+        alert("Please select a size.");
+        return;
+      }
+      const item = {
+        id: currentProductId,
+        name: document.getElementById("modalTitle").textContent,
+        price: document.getElementById("modalPrice").textContent.replace("GH₵ ", ""),
+        img: document.getElementById("mainImg").src,
+        size: selectedSize,
+        qty: quantity
+      };
+      let cart = JSON.parse(localStorage.getItem("cart")) || [];
+      cart.push(item);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      
+      const toast = document.getElementById("toast");
+      toast.textContent = `Added: ${item.name}`;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 3000);
+      updateCartBadge(); // from shared.js
+    }
+
+    window.onclick = (e) => {
+      if(e.target.id === "quickView") closeModal();
+    };
   </script>
 
 </body>

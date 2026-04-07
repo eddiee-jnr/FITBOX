@@ -346,19 +346,40 @@
     .add-cart:hover {
       opacity: 0.75;
     }
+
+    /* ── COLLECTION RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .grid { grid-template-columns: repeat(3, 1fr); }
+      .collection-section { padding: 40px 30px; }
+    }
+
+    @media (max-width: 768px) {
+      .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .collection-section { padding: 30px 15px; }
+      .collection-nav { gap: 20px; flex-wrap: wrap; }
+      .modal-box { padding: 20px; }
+      .modal-box .modal-grid { grid-template-columns: 1fr; }
+      .header h1 { font-size: 28px; }
+    }
+
+    @media (max-width: 480px) {
+      .grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .product img { height: 180px; }
+      .filters button { padding: 6px 12px; font-size: 11px; }
+    }
   </style>
 </head>
 
 <body>
 
   <!-- ── NAV ── -->
-  <nav>
-    <div class="nav-links nav-left">
-    <a href="index.html">HOME</a>
-    <a href="collection.html">COLLECTION</a>
-    <a href="about.html">ABOUT US</a>
-    <a href="contact.html">CONTACT</a>
-  </div>
+  <nav id="navbar">
+    <div class="nav-left">
+      <a href="index.html">HOME</a>
+      <a href="collection.html">COLLECTION</a>
+      <a href="about.html">ABOUT US</a>
+      <a href="contact.html">CONTACT</a>
+    </div>
 
     <div class="logo">FITBOX</div>
 
@@ -367,14 +388,16 @@
         <a href="cart.html">
           <i class="fa-solid fa-cart-shopping icon"></i>
         </a>
-        <!-- BADGE -->
         <span id="cartCount" class="cart-count">0</span>
       </div>
-      <a href="auth.html" onclick="handleAccountClick(event)" style="display:flex;align-items:center;">
+
+      <a href="auth.html" id="accountLink" class="nav-link">
         <i class="fa-solid fa-user icon"></i>
       </a>
     </div>
   </nav>
+
+  <script src="shared.js"></script>
 
   <!-- ── HEADER ── -->
   <section class="header">
@@ -736,28 +759,7 @@
       }
     }
 
-    function updateCartBadge() {
-      const c = JSON.parse(localStorage.getItem('cart')) || [];
-      const total = c.reduce((sum, item) => sum + item.qty, 0);
-      const badge = document.getElementById('cartCount');
-      if (badge) {
-        if (total > 0) {
-          badge.style.display = 'block';
-          badge.textContent = total;
-        } else {
-          badge.style.display = 'none';
-        }
-      }
-    }
-
-    window.addEventListener('load', updateCartBadge);
-
-    const links = document.querySelectorAll(".nav-left a");
-    links.forEach(link => {
-      if (window.location.href.includes(link.getAttribute("href"))) {
-        link.classList.add("active");
-      }
-    });
+    // Centralized badge updates and active link highlighting are now handled in shared.js
   </script>
 
 </body>

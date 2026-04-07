@@ -13,10 +13,6 @@ backend/.env
 .DS_Store
 Thumbs.db
 
-# Documentation
-Documentation_Progress.md
-temp_docs/
-
 # IDE files
 .vscode/
 .idea/

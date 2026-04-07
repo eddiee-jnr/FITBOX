@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS admins (
 );
 
 -- Seed Default Admin (Password: popcorn)
-INSERT IGNORE INTO admins (name, email, password, role) VALUES ('Administrator', 'admin@fitbox.com', '$2y$10$Z1eJvXQv8vT4g.8wz9U5e.v3w9w2u8z9u8z9u8z9u8z9u8z9u8z9u', 'Super Admin');
+INSERT IGNORE INTO admins (name, email, password, role) VALUES ('Administrator', 'admin@fitbox.com', '$2y$10$TxMkDv.fcYbu8Xq23Y3t1.qsq1SfRDyCosS4aMYQp08gwWArhAeGi', 'Super Admin');
 
 -- 2. CRM MODULE: Communication
 CREATE TABLE IF NOT EXISTS feedback (
@@ -137,6 +137,9 @@ INSERT IGNORE INTO products (name, price, category, section, stock_quantity, ima
 ('NYC Black Caines Edition Jersey', 170.00, 'tee', 'maestro', 14, 'images/nycblack.jpg', 0, NULL),
 ('France 1998 World Cup Home Kit', 250.00, 'tee', 'maestro', 10, 'images/france.jpg', 0, NULL),
 ('Adidas Black & White Long Sleeves', 300.00, 'hoodie', 'maestro', 18, 'images/badidas.jpg', 0, NULL),
+('Oversized Black Denim Jeans', 200.00, 'pants', 'maestro', 50, 'images/blackjeans.jpg', 0, NULL),
+('Grey/Red Brudda Sweat Pants', 220.00, 'pants', 'maestro', 25, 'images/whitepants.jpg', 0, NULL),
+('3D Printed Black Track Pants', 150.00, 'pants', 'maestro', 30, 'images/sweatpants.jpg', 0, NULL),
 
 -- LEGACY
 ('NY Brown Boxy Shirt', 170.00, 'tee', 'legacy', 50, 'images/nushirt.jpg', 0, NULL),
@@ -146,9 +149,9 @@ INSERT IGNORE INTO products (name, price, category, section, stock_quantity, ima
 ('Murilo Pink Trousers', 250.00, 'pants', 'legacy', 25, 'images/pinkpants2.jpg', 0, NULL),
 ('Checked Suvage Trousers', 200.00, 'pants', 'legacy', 18, 'images/checkedpants2.jpg', 0, NULL),
 ('Blacked Nort Sweatshirt', 200.00, 'hoodie', 'legacy', 22, 'images/nort.jpg', 0, NULL),
-('Jeans Jorts', 170.00, 'pants', 'legacy', 40, 'images/jorts3.jpg', 0, NULL),
+('Jeans Jorts', 170.00, 'pants', 'legacy', 40, 'images/jorts3.jpg', 0,  'images/jorts2.jpg'),
 ('Blouson Red Jacket', 300.00, 'tee', 'legacy', 12, 'images/redjacket.jpg', 0, NULL),
-('Blueline Thin Stripped Trouser', 350.00, 'pants', 'legacy', 10, 'images/blueline2.jpg', 0, NULL),
+('Blueline Thin Stripped Trouser', 350.00, 'pants', 'legacy', 10, 'images/blueline2.jpg', 0, 'images/blueline.jpg'),
 
 -- CUSTOM
 ('Brown Jersey', 170.00, 'tee', 'custom', 15, 'images/brownjersey.jpg', 0, NULL),

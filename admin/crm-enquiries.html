@@ -8,6 +8,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../backend.css">
     <link rel="stylesheet" href="css/crm.css">
+    <style>
+        .status-new    { background: #e1f5fe; color: #0288d1; }
+        .status-read   { background: #f5f5f5; color: #888; }
+        .status-replied{ background: #e8f5e9; color: #2e7d32; }
+
+        .action-btn.mark-read {
+            background: #f5f5f5;
+            color: #555;
+            border: 1px solid #ddd;
+        }
+        .action-btn.mark-read:hover {
+            background: #e0e0e0;
+        }
+    </style>
 </head>
 <body>
 
@@ -56,13 +70,26 @@
     });
 
     async function loadEnquiries() {
-        const res = await fetch(`${API_URL}/admin/feedback`); // Backend uses 'feedback' table
+        const res = await fetch(`${API_URL}/admin/feedback`);
         const data = await res.json();
         const tbody = document.querySelector('#enquiriesTable tbody');
         document.getElementById('enquiryCountLabel').textContent = `${data.length} enquiries received`;
         
-        tbody.innerHTML = data.map(m => `
-            <tr>
+        tbody.innerHTML = data.map(m => {
+            const status = m.status || 'new';
+            const statusClass = `status-${status}`;
+            const statusLabel = status.toUpperCase();
+            const safeSubject = (m.subject || '').replace(/'/g, "\\'");
+
+            // Only show "Mark as Read" button if still NEW
+            const markReadBtn = (status === 'new')
+                ? `<button class="action-btn mark-read" onclick="markStatus(${m.id}, 'read')">
+                       <i class="fa-solid fa-check"></i> Mark Read
+                   </button>`
+                : '';
+
+            return `
+            <tr id="enquiry-row-${m.id}">
                 <td style="font-size:12px; color:#777;">${new Date(m.created_at).toLocaleDateString()}</td>
                 <td>
                     <div style="font-weight:600;">${m.name}</div>
@@ -70,12 +97,46 @@
                 </td>
                 <td class="enquiry-subject">"${m.subject}"</td>
                 <td class="enquiry-message-preview">${m.message}</td>
-                <td><span class="badge" style="background:#e1f5fe; color:#0288d1;">${m.status.toUpperCase()}</span></td>
-                <td>
-                    <button class="action-btn" onclick="alert('Replying to ${m.email}')"><i class="fa-solid fa-reply"></i> Reply</button>
+                <td><span id="status-badge-${m.id}" class="badge ${statusClass}">${statusLabel}</span></td>
+                <td style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                    <button class="action-btn" onclick="replyToEnquiry(${m.id}, '${m.email}', '${safeSubject}')">
+                        <i class="fa-solid fa-reply"></i> Reply
+                    </button>
+                    <span id="mark-read-btn-${m.id}">${markReadBtn}</span>
                 </td>
             </tr>
-        `).join('');
+        `;
+        }).join('');
+    }
+
+    async function markStatus(id, status) {
+        try {
+            const res = await fetch(`${API_URL}/admin/feedback/${id}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status })
+            });
+
+            if (res.ok) {
+                // Update the status badge in-place — no page reload needed
+                const badge = document.getElementById(`status-badge-${id}`);
+                badge.className = `badge status-${status}`;
+                badge.textContent = status.toUpperCase();
+
+                // Remove the "Mark as Read" button once it's been actioned
+                const container = document.getElementById(`mark-read-btn-${id}`);
+                if (container) container.innerHTML = '';
+            }
+        } catch (err) {
+            console.error('Status update failed:', err);
+        }
+    }
+
+    function replyToEnquiry(id, email, subject) {
+        // Open the user's mail client with a pre-filled reply
+        window.location.href = `mailto:${email}?subject=Re: ${subject}`;
+        // Auto-mark as Replied immediately
+        markStatus(id, 'replied');
     }
 
     function filterEnquiries(input) {

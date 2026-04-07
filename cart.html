@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8">`n<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cart - FitBox</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="shared.css">
 
 <style>
@@ -26,7 +27,7 @@ h1{
 }
 
 /* CART LAYOUT */
-.cart-wrapper{
+.cart-page-layout{
   display:grid;
   grid-template-columns: 2fr 1fr;
   gap:40px;
@@ -170,22 +171,43 @@ h1{
   to{opacity:1; transform:translateY(0);}
 }
 
-</style>
+
+    /* CART RESPONSIVE */
+    @media (max-width: 768px) {
+      .cart-layout { flex-direction: column; margin-top: 70px; padding: 20px 5%; }
+      .cart-table th, .cart-table td { padding: 10px 8px; font-size: 12px; }
+      .cart-item-img { width: 50px; height: 50px; }
+    }
+    @media (max-width: 480px) {
+      .cart-layout { padding: 15px 4%; }
+    }</style>
 </head>
 
 <body>
 
 <!-- NAV -->
-<nav>
-  <div class="nav-links nav-left">
+<nav id="navbar">
+  <div class="nav-left">
     <a href="index.html">HOME</a>
     <a href="collection.html">COLLECTION</a>
+    <a href="about.html">ABOUT US</a>
+    <a href="contact.html">CONTACT</a>
   </div>
   <a href="index.html" class="logo">FITBOX</a>
-  <div class="nav-links right">
-    <a href="profile.html">PROFILE</a>
+  <div class="nav-right">
+    <div class="cart-wrapper" onclick="goToCart()">
+      <a href="cart.html">
+        <i class="fa-solid fa-cart-shopping icon"></i>
+      </a>
+      <span id="cartCount" class="cart-count">0</span>
+    </div>
+    <a href="auth.html" id="accountLink" class="nav-link">
+      <i class="fa-solid fa-user icon"></i>
+    </a>
   </div>
 </nav>
+
+<script src="shared.js"></script>
 
 <div class="container">
 
@@ -193,7 +215,7 @@ h1{
 
 <h1>Your Cart</h1>
 
-<div class="cart-wrapper">
+<div class="cart-page-layout">
 
   <!-- LEFT -->
   <div class="cart-items" id="cartItems"></div>

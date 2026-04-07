@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8">`n<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Contact & Support - FitBox</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="shared.css">
 
 <style>
@@ -139,29 +140,109 @@ button[type="submit"]:hover {
   line-height: 1.6;
 }
 
-</style>
+/* NAVBAR SPECIFIC TO CONTACT */
+nav {
+  background: transparent;
+  color: white;
+  border-bottom: none;
+}
+
+nav.scrolled {
+  background: white;
+  color: black;
+  border-bottom: 1px solid #eee;
+}
+
+nav.scrolled a {
+  color: black;
+}
+
+/* HERO */
+.contact-hero {
+  height: 60vh;
+  background: url('images/groupfour.JPG') center/cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-align: center;
+  position: relative;
+}
+
+.contact-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.3) 25%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.5) 100%);
+}
+
+.contact-hero h1, .contact-hero p, nav:not(.scrolled) .nav-left a, nav:not(.scrolled) .logo, nav:not(.scrolled) .nav-right a {
+  text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-content h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 50px;
+  color: #FDFDFD;
+}
+
+.hero-content p {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #FDFDFD;
+}
+
+    /* CONTACT RESPONSIVE */
+    @media (max-width: 768px) {
+      .contact-grid { grid-template-columns: 1fr !important; }
+      .contact-wrapper { margin-top: 70px; padding: 40px 5% !important; }
+      .contact-form { padding: 25px !important; }
+    }
+    @media (max-width: 480px) {
+      .contact-wrapper { padding: 25px 4% !important; }
+    }</style>
 </head>
 
 <body>
 
-<nav>
+<nav id="navbar" class="transparent">
   <div class="nav-left">
-    <a href="index.html" class="nav-link">HOME</a>
-    <a href="collection.html" class="nav-link">COLLECTION</a>
-    <a href="about.html" class="nav-link">ABOUT US</a>
-    <a href="contact.html" class="nav-link active">CONTACT</a>
+    <a href="index.html">HOME</a>
+    <a href="collection.html">COLLECTION</a>
+    <a href="about.html">ABOUT US</a>
+    <a href="contact.html">CONTACT</a>
   </div>
-  <a href="index.html" class="logo">FITBOX</a>
+
+  <div class="logo">FITBOX</div>
+
   <div class="nav-right">
-    <a href="auth.html" id="accountLink">
+    <div class="cart-wrapper" onclick="goToCart()">
+      <a href="cart.html">
+        <i class="fa-solid fa-cart-shopping icon"></i>
+      </a>
+      <span id="cartCount" class="cart-count">0</span>
+    </div>
+
+    <a href="auth.html" id="accountLink" class="nav-link">
       <i class="fa-solid fa-user icon"></i>
     </a>
   </div>
 </nav>
 
-<div class="page-header">
-  <h1>Contact & Support</h1>
-</div>
+<script src="shared.js"></script>
+
+<!-- HERO -->
+<section class="contact-hero">
+  <div class="hero-content">
+    <h1>Contact & Support</h1>
+    <p>We are here to help you with your streetwear journey</p>
+  </div>
+</section>
 
 <div class="contact-container">
   
@@ -274,6 +355,13 @@ button[type="submit"]:hover {
 </footer>
 
 <script>
+/* NAV SCROLL EFFECT */
+window.addEventListener("scroll", () => {
+  const nav = document.getElementById("navbar");
+  if (nav) {
+    nav.classList.toggle("scrolled", window.scrollY > 50);
+  }
+});
 async function handleContact(e) {
   e.preventDefault();
   const name = document.getElementById("contactName").value;

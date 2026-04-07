@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8">`n<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>About Us- FitBox</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
@@ -80,7 +80,7 @@ nav.scrolled a {
   padding: 100px 60px;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 60px;
+  gap: 50px;
   align-items: center;
 }
 
@@ -122,10 +122,11 @@ nav.scrolled a {
 
 /* QUOTE */
 .quote {
-  background: #0D0D0D;
-  color: white;
+  background: #f9f9f9;
+  color: #111;
   text-align: center;
-  padding: 80px 40px;
+  padding: 80px 30px;
+  border-top: 1px solid #eee;
 }
 
 .quote p {
@@ -133,15 +134,33 @@ nav.scrolled a {
   margin: auto;
   font-size: 14px;
   line-height: 1.8;
+  font-style: italic;
 }
 
 .quote h4 {
-  margin-top: 20px;
-  font-weight: 400;
-  color: #aaa;
+  margin-top: 25px;
+  font-weight: 500;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 11px;
 }
  
-</style>
+
+    /* ABOUT RESPONSIVE */
+    @media (max-width: 768px) {
+      .about-hero { margin-top: 70px; padding: 60px 5%; }
+      .about-hero h1 { font-size: 32px; }
+      .about-grid { grid-template-columns: 1fr !important; gap: 20px; }
+      .team-grid { grid-template-columns: repeat(2, 1fr) !important; }
+      .values-grid { grid-template-columns: 1fr 1fr !important; }
+      .section, section { padding: 40px 5% !important; }
+    }
+    @media (max-width: 480px) {
+      .team-grid { grid-template-columns: 1fr 1fr !important; }
+      .values-grid { grid-template-columns: 1fr !important; }
+      .about-hero h1 { font-size: 26px; }
+    }</style>
 </head>
 
 <body>
@@ -149,30 +168,29 @@ nav.scrolled a {
 <!-- NAV -->
 <nav id="navbar" class="transparent">
   <div class="nav-left">
-    <a href="index.html" class="nav-link">HOME</a>
-    <a href="collection.html" class="nav-link">COLLECTION</a>
-    <a href="about.html" class="nav-link">ABOUT US</a>
-    <a href="contact.html" class="nav-link">CONTACT</a>
+    <a href="index.html">HOME</a>
+    <a href="collection.html">COLLECTION</a>
+    <a href="about.html">ABOUT US</a>
+    <a href="contact.html">CONTACT</a>
   </div>
 
   <div class="logo">FITBOX</div>
 
   <div class="nav-right">
-    <!-- CART ICON -->
-	<div class="cart-wrapper" onclick="goToCart()">
-	<a href="cart.html">
-    <i class="fa-solid fa-cart-shopping icon"></i>
-  </a>
-  <!-- BADGE -->
-  <span id="cartCount" class="cart-count">0</span>
-</div>
+    <div class="cart-wrapper" onclick="goToCart()">
+      <a href="cart.html">
+        <i class="fa-solid fa-cart-shopping icon"></i>
+      </a>
+      <span id="cartCount" class="cart-count">0</span>
+    </div>
 
-    <!-- ACCOUNT ICON -->
-	<a href="auth.html" onclick="handleAccountClick(event)">
-    <i class="fa-solid fa-user icon"></i>
-  </a>
+    <a href="auth.html" id="accountLink" class="nav-link">
+      <i class="fa-solid fa-user icon"></i>
+    </a>
   </div>
 </nav>
+
+<script src="shared.js"></script>
 
 <!-- HERO -->
 <section class="about-hero">
@@ -304,34 +322,7 @@ document.querySelectorAll(".nav-link").forEach(link => {
   });
 });
 
-/* ACCOUNT */
-function handleAccountClick(e) {
- e.preventDefault();
- 
- const isLoggedIn = localStorage.getItem("loggedIn")
- 
- if (isLoggedIn == "true") {
-  window.location.href = "profile.html";
-  } else { 
-   window.location.href = "auth.html";
-   }
-} 
-
-function updateCartBadge() {
-  const c = JSON.parse(localStorage.getItem('cart')) || [];
-  const total = c.reduce((sum, item) => sum + item.qty, 0);
-  const badge = document.getElementById('cartCount');
-  if (badge) {
-    if (total > 0) {
-      badge.style.display = 'block';
-      badge.textContent = total;
-    } else {
-      badge.style.display = 'none';
-    }
-  }
-}
-
-window.addEventListener('load', updateCartBadge);
+// Centralized badge updates and active link highlighting are now handled in shared.js
 </script>
 
 </body>

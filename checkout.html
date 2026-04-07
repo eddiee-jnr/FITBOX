@@ -1,354 +1,406 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<title>Checkout - FitBox</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout - FitBox</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="shared.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="shared.css">
 
-<style>
-body{
-  background:#f8f8f8;
-}
+  <style>
+    body {
+      background: #f8f8f8;
+    }
 
-/* PAGE */
-.container{
-  margin-top:100px;
-  padding:40px 10%;
-  display:grid;
-  grid-template-columns: 1.5fr 1fr;
-  gap:50px;
-}
+    /* PAGE */
+    .container {
+      margin-top: 100px;
+      padding: 40px 10%;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 50px;
+    }
 
-h1, h2 {
-  font-family:'Playfair Display', serif;
-  margin-bottom:20px;
-}
+    h1,
+    h2 {
+      font-family: 'Playfair Display', serif;
+      margin-bottom: 20px;
+    }
 
-/* LEFT PANE - FORM */
-.checkout-form {
-  background: white;
-  padding: 40px;
-  border-radius: 8px;
-}
+    /* LEFT PANE - FORM */
+    .checkout-form {
+      background: white;
+      padding: 40px;
+      border-radius: 8px;
+    }
 
-.form-group {
-  margin-bottom: 20px;
-}
+    .form-group {
+      margin-bottom: 20px;
+    }
 
-.form-group label {
-  display: block;
-  font-size: 13px;
-  color: #555;
-  margin-bottom: 8px;
-}
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 8px;
+    }
 
-.form-group input, .form-group select {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ccc;
-  outline: none;
-  font-family: inherit;
-  font-size: 14px;
-}
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      outline: none;
+      font-family: inherit;
+      font-size: 14px;
+    }
 
-.form-group input:focus, .form-group select:focus {
-  border-color: black;
-}
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: black;
+    }
 
-.row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
 
-/* RIGHT PANE - SUMMARY */
-.summary{
-  background:white;
-  padding:30px;
-  border-radius:8px;
-  height:fit-content;
-}
+    /* RIGHT PANE - SUMMARY */
+    .summary {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      height: fit-content;
+    }
 
-.summary-item {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 15px;
-  align-items: center;
-}
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      align-items: center;
+    }
 
-.summary-item img {
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
-  border-radius: 4px;
-}
+    .summary-item img {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
 
-.summary-details {
-  flex: 1;
-  margin-left: 15px;
-}
+    .summary-details {
+      flex: 1;
+      margin-left: 15px;
+    }
 
-.summary-details h4 {
-  font-size: 14px;
-  font-weight: 500;
-}
+    .summary-details h4 {
+      font-size: 14px;
+      font-weight: 500;
+    }
 
-.summary-details p {
-  font-size: 12px;
-  color: #777;
-}
+    .summary-details p {
+      font-size: 12px;
+      color: #777;
+    }
 
-.summary-price {
-  font-size: 14px;
-  font-weight: 500;
-}
+    .summary-price {
+      font-size: 14px;
+      font-weight: 500;
+    }
 
-.divider {
-  height: 1px;
-  background: #eee;
-  margin: 20px 0;
-}
+    .divider {
+      height: 1px;
+      background: #eee;
+      margin: 20px 0;
+    }
 
-.totals {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  color: #555;
-  font-size: 14px;
-}
+    .totals {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      color: #555;
+      font-size: 14px;
+    }
 
-.totals.final {
-  color: black;
-  font-size: 18px;
-  font-weight: bold;
-  margin-top: 15px;
-}
+    .totals.final {
+      color: black;
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 15px;
+    }
 
-/* BUTTON */
-.btn-complete {
-  margin-top: 30px;
-  width: 100%;
-  padding: 16px;
-  border: none;
-  background: black;
-  color: white;
-  font-family: inherit;
-  font-size: 14px;
-  cursor: pointer;
-  letter-spacing: 2px;
-  transition: 0.3s;
-}
+    /* BUTTON */
+    .btn-complete {
+      margin-top: 30px;
+      width: 100%;
+      padding: 16px;
+      border: none;
+      background: black;
+      color: white;
+      font-family: inherit;
+      font-size: 14px;
+      cursor: pointer;
+      letter-spacing: 2px;
+      transition: 0.3s;
+    }
 
-.btn-complete:hover {
-  background: #333;
-}
+    .btn-complete:hover {
+      background: #333;
+    }
 
-.back-link {
-  display: block;
-  margin-top: 15px;
-  width: 100%;
-  padding: 16px;
-  border: 1px solid black;
-  background: white;
-  color: black;
-  font-family: inherit;
-  font-size: 14px;
-  text-align: center;
-  text-decoration: none;
-  cursor: pointer;
-  letter-spacing: 2px;
-  transition: 0.3s;
-}
-.back-link:hover {
-  background: black;
-  color: white;
-}
+    .back-link {
+      display: block;
+      margin-top: 15px;
+      width: 100%;
+      padding: 16px;
+      border: 1px solid black;
+      background: white;
+      color: black;
+      font-family: inherit;
+      font-size: 14px;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      letter-spacing: 2px;
+      transition: 0.3s;
+    }
 
-/* MODAL */
-.modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.8);
-  justify-content: center;
-  align-items: center;
-  z-index: 200;
-}
-.modal-content {
-  background: white;
-  padding: 50px;
-  text-align: center;
-  border-radius: 8px;
-  max-width: 400px;
-}
-.modal-content h2 {
-  font-size: 24px;
-  margin-bottom: 10px;
-}
-.modal-content p {
-  color: #777;
-  font-size: 14px;
-  margin-bottom: 30px;
-}
-.modal-content button {
-  padding: 12px 24px;
-  background: black;
-  color: white;
-  border: none;
-  cursor: pointer;
-  letter-spacing: 1px;
-}
-</style>
+    .back-link:hover {
+      background: black;
+      color: white;
+    }
+
+    /* MODAL */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 200;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 50px;
+      text-align: center;
+      border-radius: 8px;
+      max-width: 400px;
+    }
+
+    .modal-content h2 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .modal-content p {
+      color: #777;
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+
+    .modal-content button {
+      padding: 12px 24px;
+      background: black;
+      color: white;
+      border: none;
+      cursor: pointer;
+      letter-spacing: 1px;
+    }
+
+    /* ── CHECKOUT RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .container {
+        grid-template-columns: 1fr;
+        padding: 30px 5%;
+        margin-top: 70px;
+      }
+      .container > div:first-child {
+        grid-column: auto;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .checkout-form { padding: 20px; }
+      .summary { padding: 20px; }
+      .row { grid-template-columns: 1fr; }
+      .modal-content { padding: 30px 20px; max-width: 95vw; }
+      h1 { font-size: 28px !important; }
+    }
+  </style>
 </head>
 
 <body>
 
-<nav>
-  <div class="nav-links nav-left">
-    <a href="index.html">HOME</a>
-    <a href="collection.html">COLLECTION</a>
-  </div>
-  <a href="index.html" class="logo">FITBOX</a>
-  <div class="nav-links right">
-  </div>
-</nav>
-
-<div class="container">
-  <div style="grid-column: 1 / -1;">
-    <h1 style="text-align:center; font-size:42px;">Checkout</h1>
-  </div>
-  
-  <!-- LEFT: Form -->
-  <div class="checkout-form">
-    <h2>Delivery Information</h2>
-    
-    <div class="form-group">
-      <label>Email Address</label>
-      <input type="email" id="email" placeholder="john@example.com" required>
+  <nav id="navbar">
+    <div class="nav-left">
+      <a href="index.html">HOME</a>
+      <a href="collection.html">COLLECTION</a>
+      <a href="about.html">ABOUT US</a>
+      <a href="contact.html">CONTACT</a>
     </div>
-
-    <div class="form-group">
-      <label>Full Name</label>
-      <input type="text" id="fullname" placeholder="John Doe" required>
-    </div>
-
-    <div class="form-group">
-      <label>Address</label>
-      <input type="text" id="address" placeholder="123 Street Name" required>
-    </div>
-
-    <div class="row">
-      <div class="form-group">
-        <label>City</label>
-        <input type="text" id="city" placeholder="Accra" required>
+    <a href="index.html" class="logo">FITBOX</a>
+    <div class="nav-right">
+      <div class="cart-wrapper" onclick="goToCart()">
+        <a href="cart.html">
+          <i class="fa-solid fa-cart-shopping icon"></i>
+        </a>
+        <span id="cartCount" class="cart-count">0</span>
       </div>
-      <div class="form-group">
-        <label>Phone Number</label>
-        <input type="text" id="phone" placeholder="+233 550 000 000" required>
-      </div>
+
+      <a href="auth.html" id="accountLink" class="nav-link">
+        <i class="fa-solid fa-user icon"></i>
+        <span id="accountText">LOG IN</span>
+      </a>
+    </div>
+  </nav>
+
+  <script src="shared.js"></script>
+
+  <div class="container">
+    <div style="grid-column: 1 / -1;">
+      <h1 style="text-align:center; font-size:42px;">Checkout</h1>
     </div>
 
-    <h2 style="margin-top:30px;">Payment</h2>
-    <div class="form-group">
-      <select id="paymentMethod" onchange="togglePaymentDetails()">
-        <option value="card">Credit / Debit Card</option>
-        <option value="momo">Mobile Money (MoMo)</option>
-        <option value="cod">Cash on Delivery</option>
-      </select>
-    </div>
-    
-    <div id="cardDetails" style="display:block;">
+    <!-- LEFT: Form -->
+    <div class="checkout-form">
+      <h2>Delivery Information</h2>
+
       <div class="form-group">
-        <label>Card Number</label>
-        <input type="text" id="cardNumber" placeholder="5200 8282 8282 8210">
+        <label>Email Address</label>
+        <input type="email" id="email" placeholder="john@example.com" required>
       </div>
+
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="fullname" placeholder="John Doe" required>
+      </div>
+
+      <div class="form-group">
+        <label>Address</label>
+        <input type="text" id="address" placeholder="123 Street Name" required>
+      </div>
+
       <div class="row">
         <div class="form-group">
-          <label>Expiration (mm/yy)</label>
-          <input type="text" id="cardExp" placeholder="12/24">
+          <label>City</label>
+          <input type="text" id="city" placeholder="Accra" required>
         </div>
         <div class="form-group">
-          <label>CVV</label>
-          <input type="text" id="cardCvv" placeholder="245">
+          <label>Phone Number</label>
+          <input type="text" id="phone" placeholder="+233 550 000 000" required>
         </div>
       </div>
-    </div>
-    
-    <div id="momoDetails" class="form-group" style="display:none;">
-      <label>MoMo Number</label>
-      <input type="text" id="momoInput" placeholder="Enter MoMo Number">
+
+      <h2 style="margin-top:30px;">Payment</h2>
+      <div class="form-group">
+        <select id="paymentMethod" onchange="togglePaymentDetails()">
+          <option value="card">Credit / Debit Card</option>
+          <option value="momo">Mobile Money (MoMo)</option>
+          <option value="cod">Cash on Delivery</option>
+        </select>
+      </div>
+
+      <div id="cardDetails" style="display:block;">
+        <div class="form-group">
+          <label>Card Number</label>
+          <input type="text" id="cardNumber" placeholder="5200 8282 8282 8210">
+        </div>
+        <div class="row">
+          <div class="form-group">
+            <label>Expiration (mm/yy)</label>
+            <input type="text" id="cardExp" placeholder="12/24">
+          </div>
+          <div class="form-group">
+            <label>CVV</label>
+            <input type="text" id="cardCvv" placeholder="245">
+          </div>
+        </div>
+      </div>
+
+      <div id="momoDetails" class="form-group" style="display:none;">
+        <label>MoMo Number</label>
+        <input type="text" id="momoInput" placeholder="Enter MoMo Number">
+      </div>
+
+      <button class="btn-complete" onclick="completeOrder()">COMPLETE ORDER</button>
+      <a href="cart.html" class="back-link">← RETURN TO CART</a>
     </div>
 
-    <button class="btn-complete" onclick="completeOrder()">COMPLETE ORDER</button>
-    <a href="cart.html" class="back-link">← RETURN TO CART</a>
+    <!-- RIGHT: Summary -->
+    <div class="summary">
+      <h2>Order Summary</h2>
+      <div id="summaryItems"></div>
+
+      <div class="divider"></div>
+
+      <div class="totals">
+        <span>Subtotal</span>
+        <span id="subtotalPrice">GH₵ 0</span>
+      </div>
+      <div class="totals">
+        <span>Delivery</span>
+        <span id="shippingPrice">Free</span>
+      </div>
+      <div class="totals">
+        <span>Tax (1.5%)</span>
+        <span id="taxPrice">GH₵ 0</span>
+      </div>
+      <div class="totals final">
+        <span>Total</span>
+        <span id="totalPrice">GH₵ 0</span>
+      </div>
+    </div>
+
   </div>
 
-  <!-- RIGHT: Summary -->
-  <div class="summary">
-    <h2>Order Summary</h2>
-    <div id="summaryItems"></div>
-    
-    <div class="divider"></div>
-    
-    <div class="totals">
-      <span>Subtotal</span>
-      <span id="subtotalPrice">GH₵ 0</span>
-    </div>
-    <div class="totals">
-      <span>Delivery</span>
-      <span id="shippingPrice">Free</span>
-    </div>
-    <div class="totals">
-      <span>Tax (1.5%)</span>
-      <span id="taxPrice">GH₵ 0</span>
-    </div>
-    <div class="totals final">
-      <span>Total</span>
-      <span id="totalPrice">GH₵ 0</span>
+  <div class="modal" id="successModal">
+    <div class="modal-content">
+      <h2>Order Confirmed!</h2>
+      <p>Thank you for shopping at FitBox. Your items will be processed shortly.</p>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <button onclick="window.location.href='profile.html'"
+          style="background:black; color:white; border:none; padding:15px; font-weight:600; cursor:pointer; letter-spacing:1px; text-transform:uppercase; font-size:12px; width:100%;">TRACK ORDER</button>
+        <button onclick="window.location.href='index.html'"
+          style="background:white; color:black; border:1px solid black; padding:15px; font-weight:600; cursor:pointer; letter-spacing:1px; text-transform:uppercase; font-size:12px; width:100%;">CONTINUE SHOPPING</button>
+      </div>
     </div>
   </div>
 
-</div>
+  <script>
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-<!-- SUCCESS MODAL -->
-<div class="modal" id="successModal">
-  <div class="modal-content">
-    <h2>Order Confirmed!</h2>
-    <p>Thank you for shopping at FitBox. Your items will be processed shortly.</p>
-    <button onclick="window.location.href='index.html'">CONTINUE SHOPPING</button>
-  </div>
-</div>
+    // Populate existing user info if logged in
+    window.addEventListener("load", () => {
+      const customer = JSON.parse(localStorage.getItem("customer_user"));
+      if (customer) {
+        document.getElementById("email").value = customer.email || "";
+        document.getElementById("fullname").value = customer.name || "";
+        document.getElementById("address").value = customer.address || "";
+        document.getElementById("phone").value = customer.phone || "";
+      }
+      renderSummary();
+    });
 
-<script>
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    function renderSummary() {
+      const container = document.getElementById("summaryItems");
+      let total = 0;
 
-// Populate existing user info if logged in
-window.addEventListener("load", () => {
-  const customer = JSON.parse(localStorage.getItem("customer_user"));
-  if(customer) {
-    document.getElementById("email").value = customer.email || "";
-    document.getElementById("fullname").value = customer.name || "";
-    document.getElementById("address").value = customer.address || "";
-    document.getElementById("phone").value = customer.phone || "";
-  }
-  renderSummary();
-});
+      if (cart.length === 0) {
+        container.innerHTML = "<p style='color:#777; font-size:14px;'>Your cart is empty.</p>";
+        return;
+      }
 
-function renderSummary() {
-  const container = document.getElementById("summaryItems");
-  let total = 0;
-  
-  if (cart.length === 0) {
-    container.innerHTML = "<p style='color:#777; font-size:14px;'>Your cart is empty.</p>";
-    return;
-  }
-
-  container.innerHTML = "";
-  cart.forEach(item => {
-    total += item.price * item.qty;
-    container.innerHTML += `
+      container.innerHTML = "";
+      cart.forEach(item => {
+        total += item.price * item.qty;
+        container.innerHTML += `
       <div class="summary-item">
         <img src="${item.img || 'https://placehold.co/100x100?text=Item'}" alt="item">
         <div class="summary-details">
@@ -358,92 +410,93 @@ function renderSummary() {
         <div class="summary-price">GH₵ ${item.price * item.qty}</div>
       </div>
     `;
-  });
+      });
 
-  document.getElementById("subtotalPrice").textContent = `GH₵ ${total.toFixed(2)}`;
-  
-  // Delivery
-  let shippingCost = (total >= 300) ? 0 : 30;
-  document.getElementById("shippingPrice").textContent = shippingCost === 0 ? "Free" : `GH₵ ${shippingCost.toFixed(2)}`;
+      document.getElementById("subtotalPrice").textContent = `GH₵ ${total.toFixed(2)}`;
 
-  // Tax
-  let taxCost = total * 0.015;
-  document.getElementById("taxPrice").textContent = `GH₵ ${taxCost.toFixed(2)}`;
-  
-  let totalCost = total + shippingCost + taxCost;
-  document.getElementById("totalPrice").textContent = `GH₵ ${totalCost.toFixed(2)}`;
-}
+      // Delivery
+      let shippingCost = (total >= 300) ? 0 : 30;
+      document.getElementById("shippingPrice").textContent = shippingCost === 0 ? "Free" : `GH₵ ${shippingCost.toFixed(2)}`;
 
-async function completeOrder() {
-  if (cart.length === 0) {
-    alert("Your cart is empty!");
-    return;
-  }
+      // Tax
+      let taxCost = total * 0.015;
+      document.getElementById("taxPrice").textContent = `GH₵ ${taxCost.toFixed(2)}`;
 
-  // Basic validation
-  const email = document.getElementById("email").value;
-  const fullname = document.getElementById("fullname").value;
-  const address = document.getElementById("address").value;
-  const phone = document.getElementById("phone").value;
-  const method = document.getElementById("paymentMethod").value;
-  
-  if(!email || !fullname || !address || !phone) {
-    alert("Please fill in all required delivery information.");
-    return;
-  }
-
-  const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-  const delivery = (subtotal >= 300) ? 0 : 30;
-  const tax = subtotal * 0.015;
-  const total = subtotal + delivery + tax;
-
-  const customer = JSON.parse(localStorage.getItem("customer_user"));
-  const orderData = {
-    customer_id: customer ? customer.id : null,
-    total_amount: total.toFixed(2),
-    delivery_fee: delivery.toFixed(2),
-    shipping_address: address, 
-    phone_number: phone, 
-    payment_method: method,
-    cart_items: cart
-  };
-
-  try {
-    const response = await fetch("http://localhost:3000/api/orders", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(orderData)
-    });
-
-    if (response.ok) {
-      localStorage.removeItem("cart");
-      document.getElementById("successModal").style.display = "flex";
-    } else {
-      const error = await response.json();
-      alert("Order failed: " + error.error);
+      let totalCost = total + shippingCost + taxCost;
+      document.getElementById("totalPrice").textContent = `GH₵ ${totalCost.toFixed(2)}`;
     }
-  } catch (err) {
-    console.error("Order error:", err);
-    alert("Could not connect to the server.");
-  }
-}
-function togglePaymentDetails() {
-  const method = document.getElementById("paymentMethod").value;
-  const cardBox = document.getElementById("cardDetails");
-  const momoBox = document.getElementById("momoDetails");
-  
-  if(method === "card") {
-    cardBox.style.display = "block";
-    momoBox.style.display = "none";
-  } else if(method === "momo") {
-    cardBox.style.display = "none";
-    momoBox.style.display = "block";
-  } else {
-    cardBox.style.display = "none";
-    momoBox.style.display = "none";
-  }
-}
-</script>
+
+    async function completeOrder() {
+      if (cart.length === 0) {
+        alert("Your cart is empty!");
+        return;
+      }
+
+      // Basic validation
+      const email = document.getElementById("email").value;
+      const fullname = document.getElementById("fullname").value;
+      const address = document.getElementById("address").value;
+      const phone = document.getElementById("phone").value;
+      const method = document.getElementById("paymentMethod").value;
+
+      if (!email || !fullname || !address || !phone) {
+        alert("Please fill in all required delivery information.");
+        return;
+      }
+
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      const delivery = (subtotal >= 300) ? 0 : 30;
+      const tax = subtotal * 0.015;
+      const total = subtotal + delivery + tax;
+
+      const customer = JSON.parse(localStorage.getItem("customer_user"));
+      const orderData = {
+        customer_id: customer ? customer.id : null,
+        total_amount: total.toFixed(2),
+        delivery_fee: delivery.toFixed(2),
+        shipping_address: address,
+        phone_number: phone,
+        payment_method: method,
+        cart_items: cart
+      };
+
+      try {
+        const response = await fetch("http://localhost:3000/api/orders", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(orderData)
+        });
+
+        if (response.ok) {
+          localStorage.removeItem("cart");
+          document.getElementById("successModal").style.display = "flex";
+        } else {
+          const error = await response.json();
+          alert("Order failed: " + error.error);
+        }
+      } catch (err) {
+        console.error("Order error:", err);
+        alert("Could not connect to the server.");
+      }
+    }
+    function togglePaymentDetails() {
+      const method = document.getElementById("paymentMethod").value;
+      const cardBox = document.getElementById("cardDetails");
+      const momoBox = document.getElementById("momoDetails");
+
+      if (method === "card") {
+        cardBox.style.display = "block";
+        momoBox.style.display = "none";
+      } else if (method === "momo") {
+        cardBox.style.display = "none";
+        momoBox.style.display = "block";
+      } else {
+        cardBox.style.display = "none";
+        momoBox.style.display = "none";
+      }
+    }
+  </script>
 
 </body>
+
 </html>

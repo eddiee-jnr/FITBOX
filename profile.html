@@ -2,31 +2,43 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard - FitBox</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="shared.css">
 
 <style>
-body{
-  background:#f8f8f8;
+:root {
+  --fb-black: #0D0D0D;
+  --fb-gold: #D4AF37;
+  --fb-grey: #f8f8f8;
+  --fb-border: #eee;
+  --fb-text-muted: #888;
+}
+
+body {
+  background: var(--fb-grey);
 }
 
 /* PAGE HEADER */
 .page-header {
-  margin-top: 100px;
-  padding: 40px 10%;
-  background: #0D0D0D;
+  margin-top: 60px; /* Tight fit under fixed nav */
+  padding: 60px 10%;
+  background: var(--fb-black);
   color: white;
+  text-align: center;
 }
 
 .page-header h1 {
   font-family: 'Playfair Display', serif;
-  font-size: 36px;
+  font-size: 32px;
+  letter-spacing: 1px;
 }
 
 .page-header p {
-  color: #aaa;
+  color: var(--fb-text-muted);
   margin-top: 10px;
   font-size: 14px;
 }
@@ -34,164 +46,442 @@ body{
 /* DASHBOARD LAYOUT */
 .dashboard-container {
   display: grid;
-  grid-template-columns: 250px 1fr;
+  grid-template-columns: 240px 1fr;
   gap: 40px;
   padding: 40px 10%;
-  min-height: 50vh;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 /* SIDEBAR */
 .sidebar {
   background: white;
-  padding: 30px;
-  border-radius: 8px;
+  padding: 30px 20px;
+  border-radius: 12px;
   height: fit-content;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
 }
 
 .sidebar button {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   width: 100%;
   text-align: left;
   background: none;
   border: none;
-  padding: 12px 0;
+  padding: 15px 12px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 14px;
-  color: #777;
+  font-size: 13px;
+  color: #666;
   cursor: pointer;
-  border-bottom: 1px solid #eee;
-  transition: 0.3s;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  margin-bottom: 5px;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+.sidebar button i {
+  font-size: 16px;
+  width: 20px;
 }
 
 .sidebar button:hover, .sidebar button.active {
-  color: black;
-  font-weight: 500;
-  padding-left: 5px;
+  background: #fdfdfd;
+  color: var(--fb-black);
+  font-weight: 600;
+  box-shadow: inset 2px 0 0 var(--fb-black);
 }
 
 .sidebar .logout {
-  color: red;
-  border-bottom: none;
-  margin-top: 20px;
+  color: #ff4d4d;
+  margin-top: 30px;
+  border-top: 1px solid #f5f5f5;
+  padding-top: 20px;
+  border-radius: 0;
+}
+
+.sidebar .logout:hover {
+  background: #fff5f5;
+  box-shadow: none;
 }
 
 /* CONTENT AREA */
 .content-area {
-  background: white;
-  padding: 40px;
-  border-radius: 8px;
+  min-height: 600px;
 }
 
 .tab-pane {
   display: none;
-  animation: fadeIn 0.4s ease;
+  animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .tab-pane.active {
   display: block;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-.tab-pane h2 {
-  font-family: 'Playfair Display', serif;
+/* DASHBOARD OVERVIEW */
+.welcome-card {
+  background: white;
+  padding: 40px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 30px;
   margin-bottom: 30px;
-  font-size: 24px;
+  box-shadow: 0 4px 25px rgba(0,0,0,0.04);
 }
 
-/* PROFILE FORM */
-.form-group {
-  margin-bottom: 20px;
+.avatar-circle {
+  width: 80px;
+  height: 80px;
+  background: var(--fb-black);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+  box-shadow: 0 8px 15px rgba(0,0,0,0.1);
 }
+
+.welcome-info h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+
+.btn-edit-inline {
+  font-size: 11px;
+  padding: 6px 15px;
+  background: #f0f0f0;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: 0.3s;
+}
+
+.btn-edit-inline:hover { background: #e5e5e5; }
+
+/* ICON GRID */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+}
+
+.stat-card i {
+  font-size: 24px;
+  color: var(--fb-black);
+  margin-bottom: 15px;
+}
+
+.stat-card h3 {
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+
+.stat-card p {
+  color: var(--fb-text-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* LIVE TRACKER */
+.tracker-card {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 4px 25px rgba(0,0,0,0.04);
+}
+
+.tracker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.tracker-header h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+}
+
+.view-all-link {
+  font-size: 12px;
+  color: var(--fb-black);
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 1px solid var(--fb-black);
+  padding-bottom: 2px;
+}
+
+.tracker-steps {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin: 40px 0;
+}
+
+.tracker-steps::before {
+  content: "";
+  position: absolute;
+  top: 15px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #f0f0f0;
+  z-index: 1;
+}
+
+.step {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  flex: 1;
+}
+
+.step-icon {
+  width: 32px;
+  height: 32px;
+  background: white;
+  border: 2px solid #f0f0f0;
+  border-radius: 50%;
+  margin: 0 auto 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #ccc;
+  transition: 0.3s;
+}
+
+.step.active .step-icon {
+  border-color: var(--fb-black);
+  background: var(--fb-black);
+  color: white;
+}
+
+.step.completed .step-icon {
+  border-color: var(--fb-black);
+  background: white;
+  color: var(--fb-black);
+}
+
+.step-label {
+  font-size: 11px;
+  color: var(--fb-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.step.active .step-label { color: var(--fb-black); }
+
+.est-delivery {
+  font-size: 12px;
+  color: var(--fb-gold);
+  margin-top: 15px;
+  text-align: center;
+  font-weight: 600;
+  display: none;
+}
+
+/* ORDER HISTORY LIST */
+.order-card {
+  background: white;
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+}
+
+.order-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.order-top h4 { font-size: 15px; font-family: 'Playfair Display', serif; }
+
+.status-pill {
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.status-pill.shipped { background: #fdf4ff; color: #a21caf; }
+.status-pill.delivered { background: #f0fdf4; color: #15803d; }
+.status-pill.processing { background: #eff6ff; color: #1d4ed8; }
+.status-pill.pending { background: #fffbeb; color: #b45309; }
+
+.item-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 15px;
+}
+
+.item-row:last-child { margin-bottom: 0; }
+
+.item-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+  background: #f5f5f5;
+}
+
+.item-info { flex: 1; }
+.item-info h5 { font-size: 13px; margin-bottom: 3px; font-weight: 600; }
+.item-info p { font-size: 11px; color: var(--fb-text-muted); }
+
+.item-price {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* MODAL / FORM */
+.profile-form-box {
+  background: white;
+  padding: 50px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+}
+
+.form-group {
+  margin-bottom: 25px;
+}
+
 .form-group label {
   display: block;
-  font-size: 13px;
-  color: #555;
-  margin-bottom: 8px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--fb-text-muted);
+  margin-bottom: 12px;
+  font-weight: 600;
 }
+
 .form-group input {
   width: 100%;
-  padding: 12px;
-  border: 1px solid #ccc;
-  outline: none;
+  padding: 12px 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
   font-family: inherit;
-  background:#fdfdfd;
+  font-size: 14px;
 }
 
 .btn-save {
-  padding: 12px 24px;
-  background: black;
+  width: 100%;
+  padding: 15px;
+  background: var(--fb-black);
   color: white;
   border: none;
+  border-radius: 8px;
   cursor: pointer;
+  font-weight: 600;
   letter-spacing: 1px;
-  margin-top: 10px;
+  transition: 0.3s;
 }
 
-/* ORDERS LIST */
-.order-card {
-  border: 1px solid #eee;
-  padding: 20px;
-  margin-bottom: 15px;
-  border-radius: 6px;
+.btn-save:hover { background: #333; }
+
+/* ── PROFILE RESPONSIVE ── */
+@media (max-width: 900px) {
+  .dashboard-container {
+    grid-template-columns: 1fr;
+    padding: 20px 5%;
+    gap: 20px;
+  }
+  .sidebar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 15px;
+    align-items: center;
+  }
+  .sidebar button {
+    padding: 10px 14px;
+    margin-bottom: 0;
+    flex: 0 0 auto;
+    font-size: 12px;
+  }
+  .sidebar .logout {
+    margin-top: 0;
+    border-top: none;
+    padding-top: 0;
+  }
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .page-header { padding: 40px 5%; }
+  .page-header h1 { font-size: 24px; }
 }
 
-.order-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 15px;
-  padding-bottom: 15px;
-  border-bottom: 1px dashed #eee;
+@media (max-width: 480px) {
+  .dashboard-container { padding: 15px 4%; }
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .stat-card { padding: 18px 12px; }
+  .welcome-card { flex-direction: column; text-align: center; padding: 25px 15px; }
+  .tracker-steps { gap: 0; }
+  .step span { font-size: 9px; }
+  .item-row { flex-wrap: wrap; }
+  .profile-form-box { padding: 25px 15px; }
+  .order-card { padding: 15px; }
 }
 
-.order-header h4 {
-  font-size: 15px;
-}
-
-.order-status {
-  padding: 4px 12px;
-  border-radius: 4px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-.order-status.pending { background: #FFF8E1; color: #B7791F; }
-.order-status.processing { background: #FFF3E0; color: #E65100; }
-.order-status.shipped { background: #F3E5F5; color: #7B1FA2; }
-.order-status.delivered { background: #E8F5E9; color: #2E7D32; }
-.order-status.cancelled, .order-status.failed { background: #FFEBEE; color: #C62828; }
-
-.order-details {
-  font-size: 13px;
-  color: #555;
-}
-
-.empty-state {
-  text-align: center;
-  color: #777;
-  padding: 40px 0;
-}
 </style>
 </head>
 
 <body>
 
-<nav>
-  <div class="nav-links nav-left">
+<nav id="navbar">
+  <div class="nav-left">
     <a href="index.html">HOME</a>
     <a href="collection.html">COLLECTION</a>
     <a href="about.html">ABOUT US</a>
     <a href="contact.html">CONTACT</a>
   </div>
   <a href="index.html" class="logo">FITBOX</a>
-  <div class="nav-links right">
-    <a href="profile.html" class="active">PROFILE</a>
+  <div class="nav-right">
+    <div class="cart-wrapper" onclick="goToCart()">
+      <a href="cart.html">
+        <i class="fa-solid fa-cart-shopping icon"></i>
+      </a>
+      <span id="cartCount" class="cart-count">0</span>
+    </div>
+    <a href="auth.html" id="accountLink" class="nav-link">
+      <i class="fa-solid fa-user icon"></i>
+    </a>
   </div>
 </nav>
+
+  <script src="shared.js"></script>
 
 <div id="toast" class="toast">Profile updated successfully!</div>
 
@@ -204,43 +494,119 @@ body{
   
   <!-- SIDEBAR -->
   <div class="sidebar">
-    <button class="active" onclick="switchTab(this, 'profileTab')">My Profile</button>
-    <button onclick="switchTab(this, 'ordersTab')">Order History</button>
-    <button class="logout" onclick="logout()">LOG OUT</button>
+    <button class="active" onclick="switchTab(this, 'dashboardTab')">
+      <i class="fa-solid fa-house"></i> Dashboard
+    </button>
+    <button onclick="switchTab(this, 'profileTab')">
+      <i class="fa-solid fa-user"></i> My Profile
+    </button>
+    <button onclick="switchTab(this, 'ordersTab')">
+      <i class="fa-solid fa-box"></i> Order History
+    </button>
+    <button class="logout" onclick="logout()">
+      <i class="fa-solid fa-right-from-bracket"></i> LOG OUT
+    </button>
   </div>
 
   <!-- CONTENT -->
   <div class="content-area">
+
+    <!-- Dashboard Overview Tab -->
+    <div id="dashboardTab" class="tab-pane active">
+      <div class="welcome-card">
+        <div class="avatar-circle" id="userInitials">U</div>
+        <div class="welcome-info">
+          <h2 id="summaryName">User Name</h2>
+          <button class="btn-edit-inline" onclick="switchTab(null, 'profileTab')">Edit account</button>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <h3 id="statOrders">0</h3>
+          <p>Total Orders</p>
+        </div>
+        <div class="stat-card">
+          <i class="fa-solid fa-ticket"></i>
+          <h3>0</h3>
+          <p>Coupons</p>
+        </div>
+        <div class="stat-card">
+          <i class="fa-solid fa-wallet"></i>
+          <h3>GH₵ 0</h3>
+          <p>Wallet Balance</p>
+        </div>
+      </div>
+
+      <!-- Live Tracker Section -->
+      <div class="tracker-card">
+        <div class="tracker-header">
+          <h3>Recent Order Tracking</h3>
+          <a href="#" class="view-all-link" onclick="switchTab(null, 'ordersTab')">View all orders</a>
+        </div>
+        
+        <div id="noActiveOrder" style="display:none; text-align:center; color:#888; padding:20px;">
+          No active orders to track.
+        </div>
+
+        <div id="trackerContent">
+          <div class="tracker-steps">
+            <div class="step" id="step-confirmed">
+              <div class="step-icon"><i class="fa-solid fa-check"></i></div>
+              <div class="step-label">Confirmed</div>
+            </div>
+            <div class="step" id="step-processing">
+              <div class="step-icon"><i class="fa-solid fa-spinner"></i></div>
+              <div class="step-label">Processing</div>
+            </div>
+            <div class="step" id="step-shipped">
+              <div class="step-icon"><i class="fa-solid fa-truck"></i></div>
+              <div class="step-label">Shipped</div>
+            </div>
+            <div class="step" id="step-delivered">
+              <div class="step-icon"><i class="fa-solid fa-house-chimney"></i></div>
+              <div class="step-label">Delivered</div>
+            </div>
+          </div>
+          <div id="shippedEst" class="est-delivery">Estimated Delivery: 1-3 Days</div>
+          <div id="recentItemsPreview" style="margin-top:15px; border-top:1px solid #f5f5f5; padding-top:15px;">
+            <!-- Items will be injected here if <= 3 -->
+          </div>
+        </div>
+      </div>
+    </div>
     
     <!-- Profile Tab -->
-    <div id="profileTab" class="tab-pane active">
-      <h2>Profile Information</h2>
-      
-      <div class="form-group">
-        <label>Full Name</label>
-        <input type="text" id="profName" placeholder="Enter name">
+    <div id="profileTab" class="tab-pane">
+      <div class="profile-form-box">
+        <h2>Profile Information</h2>
+        
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="profName" placeholder="Enter name">
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="profEmail" placeholder="Enter email" readonly>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="text" id="profPhone" placeholder="+233 ...">
+        </div>
+        <div class="form-group">
+          <label>Address</label>
+          <input type="text" id="profAddress" placeholder="Enter address">
+        </div>
+        
+        <button class="btn-save" onclick="updateProfile()">SAVE CHANGES</button>
       </div>
-      <div class="form-group">
-        <label>Email Address</label>
-        <input type="email" id="profEmail" placeholder="Enter email" readonly>
-      </div>
-      <div class="form-group">
-        <label>Phone Number</label>
-        <input type="text" id="profPhone" placeholder="+233 ...">
-      </div>
-      <div class="form-group">
-        <label>Address</label>
-        <input type="text" id="profAddress" placeholder="Enter address">
-      </div>
-      
-      <button class="btn-save" onclick="updateProfile()">SAVE CHANGES</button>
     </div>
 
     <!-- Orders Tab -->
     <div id="ordersTab" class="tab-pane">
       <h2>Order History</h2>
       <div id="ordersList">
-        <!-- Dynamic orders will be injected here -->
         <div class="empty-state">Loading your orders...</div>
       </div>
     </div>
@@ -317,7 +683,6 @@ if(!user || localStorage.getItem("customer_loggedIn") !== "true") {
 // Initial Load
 document.addEventListener("DOMContentLoaded", () => {
   if (user) {
-    document.getElementById("welcomeText").textContent = "Welcome, " + user.name;
     loadProfile();
     loadOrderHistory();
   }
@@ -332,6 +697,11 @@ async function loadProfile() {
       document.getElementById("profEmail").value = data.email;
       document.getElementById("profPhone").value = data.phone || "";
       document.getElementById("profAddress").value = data.address || "";
+      
+      // Update Dashboard Summary
+      document.getElementById("summaryName").textContent = data.name;
+      const initials = data.name.split(' ').map(n => n[0]).join('').toUpperCase();
+      document.getElementById("userInitials").textContent = initials.substring(0, 2);
     }
   } catch (err) {
     console.error("Profile load failed");
@@ -340,39 +710,148 @@ async function loadProfile() {
 
 async function loadOrderHistory() {
   const list = document.getElementById("ordersList");
+  const statOrders = document.getElementById("statOrders");
+  
   try {
     const res = await fetch(`${API_URL}/orders/customer/${user.id}`);
     const orders = await res.json();
 
+    if (statOrders) statOrders.textContent = orders.length;
+
     if (orders.length === 0) {
       list.innerHTML = '<div class="empty-state">You haven\'t placed any orders yet.</div>';
+      document.getElementById("trackerContent").style.display = "none";
+      document.getElementById("noActiveOrder").style.display = "block";
       return;
     }
 
+    // 1. Smart Priority Tracker: Find the latest ACTIVE (non-delivered) order first
+    let priorityOrder = orders.find(o => o.status.toLowerCase() !== 'delivered');
+    
+    // Fallback: If all are delivered, show the absolute latest one
+    if (!priorityOrder) priorityOrder = orders[0];
+
+    renderTracker(priorityOrder);
+
+    // 2. Render Order History List
     list.innerHTML = "";
     orders.forEach(order => {
+      let itemsHtml = "";
+      if (order.items && order.items.length > 0) {
+        order.items.forEach(item => {
+          // Normalize image path if needed (handle Absolute/Relative)
+          const imgPath = item.image_url ? (item.image_url.startsWith('http') ? item.image_url : item.image_url) : 'images/placeholder.jpg';
+          
+          itemsHtml += `
+            <div class="item-row">
+              <img src="${imgPath}" class="item-img" onerror="this.src='images/placeholder.jpg'">
+              <div class="item-info">
+                <h5>${item.product_name}</h5>
+                <p>Size: ${item.size} | Qty: ${item.quantity}</p>
+              </div>
+              <div class="item-price">GH₵ ${item.price_at_time}</div>
+            </div>
+          `;
+        });
+      }
+
       list.innerHTML += `
         <div class="order-card">
-          <div class="order-header">
-            <h4>Order #FB-${order.id}</h4>
-            <span class="order-status ${order.status}">${order.status.toUpperCase()}</span>
+          <div class="order-top">
+            <h4>Order #FB-${order.id} | ${new Date(order.created_at).toLocaleDateString()}</h4>
+            <span class="status-pill ${order.status}">${order.status.toUpperCase()}</span>
           </div>
-          <div class="order-details">
-            <p><strong>Date:</strong> ${new Date(order.created_at).toLocaleDateString()}</p>
-            <p><strong>Total:</strong> GH₵ ${order.total_amount}</p>
-            <p><strong>Items:</strong> ${order.items_summary || "Details not found"}</p>
+          <div class="order-items-list">
+            ${itemsHtml}
+          </div>
+          <div style="margin-top:15px; text-align:right; border-top:1px solid #f5f5f5; padding-top:10px;">
+             <strong>Total: GH₵ ${order.total_amount}</strong>
           </div>
         </div>
       `;
     });
   } catch (err) {
+    console.error(err);
     list.innerHTML = '<div class="empty-state">Failed to load order history.</div>';
   }
 }
 
+function renderTracker(order) {
+  const steps = ['confirmed', 'processing', 'shipped', 'delivered'];
+  const currentIdx = steps.indexOf(order.status.toLowerCase());
+  
+  // Reset steps
+  steps.forEach(s => {
+    const el = document.getElementById(`step-${s}`);
+    if (el) el.className = 'step';
+  });
+
+  // Highlight steps
+  for (let i = 0; i <= currentIdx; i++) {
+    const el = document.getElementById(`step-${steps[i]}`);
+    if (el) {
+      if (i < currentIdx) el.classList.add('completed');
+      if (i === currentIdx) el.classList.add('active');
+    }
+  }
+
+  // Handle Shipped Estimate
+  const shippedEst = document.getElementById("shippedEst");
+  if (order.status.toLowerCase() === 'shipped') {
+    shippedEst.style.display = "block";
+  } else {
+    shippedEst.style.display = "none";
+  }
+
+  // Handle Items Preview (Up to 3 items)
+  const preview = document.getElementById("recentItemsPreview");
+  if (order.items && order.items.length > 0) {
+    preview.style.display = "block";
+    let html = '<p style="font-size:11px; color:#888; text-transform:uppercase; letter-spacing:1px; margin-bottom:15px;">Order Contents</p>';
+    
+    // Show up to 3 items
+    const displayItems = order.items.slice(0, 3);
+    displayItems.forEach(item => {
+      const imgPath = item.image_url ? (item.image_url.startsWith('http') ? item.image_url : item.image_url) : 'images/placeholder.jpg';
+      html += `
+        <div class="item-row" style="margin-bottom:12px; display:flex; align-items:center; justify-content:space-between;">
+          <div style="display:flex; align-items:center; gap:15px;">
+            <img src="${imgPath}" class="item-img" style="width:50px; height:50px; border-radius:8px;" onerror="this.src='images/placeholder.jpg'">
+            <div class="item-info">
+              <h5 style="font-size:14px; margin:0; font-weight:600;">${item.product_name}</h5>
+              <p style="font-size:12px; color:#888; margin:2px 0 0;">Size: ${item.size} | Qty: ${item.quantity}</p>
+            </div>
+          </div>
+          <div style="font-size:15px; font-weight:600; font-family:'Montserrat', sans-serif;">
+            GH₵ ${item.price_at_time}
+          </div>
+        </div>
+      `;
+    });
+    
+    if (order.items.length > 3) {
+      html += `<p style="font-size:11px; color:#888; font-style:italic; margin-top:5px;">+ ${order.items.length - 3} more items...</p>`;
+    }
+    preview.innerHTML = html;
+  } else {
+    preview.style.display = "none";
+  }
+}
+
 function switchTab(btn, tabId) {
-  document.querySelectorAll(".sidebar button").forEach(b => b.classList.remove("active"));
-  btn.classList.add("active");
+  // If btn is null, we are navigating from an inline link
+  if (!btn) {
+    // Find the corresponding sidebar button
+    document.querySelectorAll(".sidebar button").forEach(b => {
+      if (b.onclick.toString().includes(tabId)) btn = b;
+    });
+  }
+  
+  if (btn) {
+    document.querySelectorAll(".sidebar button").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+  }
+  
   document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
   document.getElementById(tabId).classList.add("active");
 }
@@ -390,10 +869,14 @@ async function updateProfile() {
     });
 
     if (res.ok) {
-      user.name = name; // Update local session
+      user.name = name; 
       localStorage.setItem("customer_user", JSON.stringify(user));
-      document.getElementById("welcomeText").textContent = "Welcome, " + user.name;
       
+      // Update UI
+      document.getElementById("summaryName").textContent = name;
+      const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
+      document.getElementById("userInitials").textContent = initials.substring(0, 2);
+
       const toast = document.getElementById("toast");
       toast.classList.add("show");
       setTimeout(() => toast.classList.remove("show"), 3000);
@@ -404,9 +887,7 @@ async function updateProfile() {
 }
 
 function logout() {
-  localStorage.removeItem("customer_user");
-  localStorage.removeItem("customer_loggedIn");
-  window.location.href = "index.html";
+  logoutCustomer();
 }
 </script>
 
