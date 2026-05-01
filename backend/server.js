@@ -39,6 +39,19 @@ app.get('/api/ping', (req, res) => {
   res.json({ message: 'Server is up with latest code', time: new Date() });
 });
 
+// ── PUBLIC PRODUCTS API ──
+app.get('/api/products', async (req, res) => {
+  try {
+    const [products] = await db.execute(
+      'SELECT id, name, price, category, section, stock_quantity, image_url, extra_images FROM products WHERE is_hidden = 0 ORDER BY section, name'
+    );
+    res.json(products);
+  } catch (err) {
+    console.error('[PRODUCTS ERROR]', err);
+    res.status(500).json({ error: 'Failed to load products' });
+  }
+});
+
 // ── AUTHENTICATION ──
 app.post('/api/register', async (req, res) => {
   const { name, email, password } = req.body;
