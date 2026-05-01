@@ -371,7 +371,7 @@ async function handleContact(e) {
   const message = document.getElementById("contactMsg").value;
 
   try {
-    const res = await fetch(`http://localhost:3000/api/feedback`, {
+    const res = await fetch(`https://fitbox-production.up.railway.app/api/feedback`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email, subject, message })

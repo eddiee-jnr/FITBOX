@@ -105,4 +105,4 @@ function logout() {
 }
 
 // Global API Helper
-const API_URL = "http://localhost:3000/api";
+const API_URL = "https://fitbox-production.up.railway.app/api";

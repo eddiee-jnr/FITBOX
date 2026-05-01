@@ -3,7 +3,7 @@
  * Handles: Authentication UI, Cart Synchroniation, and Navigation Guard
  */
 
-const API_BASE = "http://localhost:3000/api";
+const API_BASE = "https://fitbox-production.up.railway.app/api";
 
 document.addEventListener("DOMContentLoaded", () => {
     updateHeaderAuth();
