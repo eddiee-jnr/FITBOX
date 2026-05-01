@@ -12,6 +12,19 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+// ── CASE-INSENSITIVE IMAGE SERVING (fixes Linux case-sensitivity) ──
+const fs = require('fs');
+app.use('/images', (req, res, next) => {
+  const imagesDir = path.join(__dirname, '..', 'images');
+  const requestedFile = decodeURIComponent(req.path.slice(1));
+  try {
+    const files = fs.readdirSync(imagesDir);
+    const match = files.find(f => f.toLowerCase() === requestedFile.toLowerCase());
+    if (match) return res.sendFile(path.join(imagesDir, match));
+  } catch (e) {}
+  next();
+});
+
 // ── STATIC FILE SERVING ──
 app.use(express.static(path.join(__dirname, '..')));
 app.use('/admin', express.static(path.join(__dirname, '../admin')));
